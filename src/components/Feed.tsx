@@ -4,6 +4,8 @@ import Post from './Post';
 
 const posts = [
   {
+
+
     id: 1,
     username: 'Fede',
     userImage: 'https://loremflickr.com/640/360',
@@ -13,7 +15,7 @@ const posts = [
   {
     id: 2,
     username: 'Marcos',
-    userImage: 'https://loremflickr.com/240/360',
+    userImage: 'https://baconmockup.com/640/360',
     postImage: 'https://loremflickr.com/640/360',
     caption: 'Rompi Produccion.. :-('
   },
@@ -21,13 +23,13 @@ const posts = [
     id: 3,
     username: 'Edu',
     userImage: 'https://loremflickr.com/640/360',
-    postImage: 'https://loremflickr.com/640/360',
-    caption: 'Rompi Produccion.. :-('
+    postImage: 'https://placebear.com/640/360',
+    caption: 'Hola a todos!! Rompi Produccion.. :-('
   },
   {
     id: 4,
     username: 'Marcos',
-    userImage: 'https://loremflickr.com/640/360',
+    userImage: 'https://picsum.photos/640/360',
     postImage: 'https://loremflickr.com/640/360',
     caption: 'Rompi Produccion.. :-('
   },

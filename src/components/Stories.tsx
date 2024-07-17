@@ -3,9 +3,9 @@ import React from 'react';
 
 const stories = [
   { id: 1, name: 'Fede', image: 'https://loremflickr.com/640/360' },
-  { id: 2, name: 'Marcos', image: 'https://loremflickr.com/640/360' },
-  { id: 3, name: 'Edu', image: 'https://loremflickr.com/640/360' },
-  { id: 4, name: 'Agus', image: 'https://loremflickr.com/640/360' },
+  { id: 2, name: 'Marcos', image: 'https://baconmockup.com/640/360' },
+  { id: 3, name: 'Edu', image: 'https://placebear.com/640/360' },
+  { id: 4, name: 'Agus', image: 'https://picsum.photos/640/360' },
   // Agrega más historias aquí
 ];
 
