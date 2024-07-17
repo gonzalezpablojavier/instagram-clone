@@ -7,6 +7,8 @@ import Feed from './components/Feed';
 import BottomNav from './components/BottomNav';
 import Login from './components/Login';
 import Applications from './components/Applications';
+import Reconocemos from './components/Reconocemos';
+
 const App: React.FC = () => {
   return (
     <Router>
@@ -17,6 +19,7 @@ const App: React.FC = () => {
             <Route path="/" element={<><Stories /><Feed /></>} />
             <Route path="/login" element={<Login />} />
             <Route path="/new" element={<Applications />} />
+            <Route path="/reconocemos" element={<Reconocemos />} />
           </Routes>
         </div>
         <BottomNav />

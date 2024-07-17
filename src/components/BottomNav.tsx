@@ -7,8 +7,8 @@ const BottomNav: React.FC = () => {
 
   return (
     <nav className="bg-white fixed bottom-0 left-0 right-0 shadow-md flex justify-around p-4 z-10">
-      <button onClick={() => navigate('/')}>🏠</button>
-      <button onClick={() => navigate('/search')}>🔍</button>
+      <button onClick={() => navigate('/')}>🏠</button>     
+      <button onClick={() => navigate('/reconocemos')}>🌟</button>
       <button onClick={() => navigate('/new')}>➕</button>
       <button onClick={() => navigate('/likes')}>❤️</button>
       <button onClick={() => navigate('/login')}>👤</button>
