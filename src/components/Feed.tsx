@@ -6,15 +6,29 @@ const posts = [
   {
     id: 1,
     username: 'Fede',
-    userImage: 'https://via.placeholder.com/50',
-    postImage: 'https://via.placeholder.com/50',
+    userImage: 'https://loremflickr.com/640/360',
+    postImage: 'https://loremflickr.com/640/360',
     caption: 'Hola Amigos!'
   },
   {
     id: 2,
     username: 'Marcos',
-    userImage: 'https://via.placeholder.com/50',
-    postImage: 'https://via.placeholder.com/50',
+    userImage: 'https://loremflickr.com/240/360',
+    postImage: 'https://loremflickr.com/640/360',
+    caption: 'Rompi Produccion.. :-('
+  },
+  {
+    id: 3,
+    username: 'Edu',
+    userImage: 'https://loremflickr.com/640/360',
+    postImage: 'https://loremflickr.com/640/360',
+    caption: 'Rompi Produccion.. :-('
+  },
+  {
+    id: 4,
+    username: 'Marcos',
+    userImage: 'https://loremflickr.com/640/360',
+    postImage: 'https://loremflickr.com/640/360',
     caption: 'Rompi Produccion.. :-('
   },
   // Agrega más publicaciones aquí
