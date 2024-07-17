@@ -13,7 +13,7 @@ const posts = [
       title: 'INNOVACIÓN',
       image: 'https://loremflickr.com/200/100',
       recipient: {
-        name: 'Jose Montes',
+        name: 'Marce Zarate',
         description: 'Si bien es pasante, trabaja a la par del equipo, con muchas ganas y buenas ideas.',
         profileImage: 'https://via.placeholder.com/50',
       },
