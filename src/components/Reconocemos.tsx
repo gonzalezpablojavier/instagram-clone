@@ -5,15 +5,15 @@ const posts = [
   {
     id: 1,
     user: {
-      name: 'Robert Nill',
+      name: 'Agustin',
       time: 'Hace 35 min',
       profileImage: 'https://via.placeholder.com/50',
     },
     recognition: {
       title: 'INNOVACIÓN',
-      image: 'https://via.placeholder.com/200x100',
+      image: 'https://loremflickr.com/200/100',
       recipient: {
-        name: 'Martina Model',
+        name: 'Jose Montes',
         description: 'Si bien es pasante, trabaja a la par del equipo, con muchas ganas y buenas ideas.',
         profileImage: 'https://via.placeholder.com/50',
       },
@@ -30,7 +30,7 @@ const posts = [
   {
     id: 2,
     user: {
-      name: 'Benjamin Astor',
+      name: 'Pablin',
       time: 'Hace 35 min',
       profileImage: 'https://via.placeholder.com/50',
     },
@@ -38,7 +38,7 @@ const posts = [
       title: 'TRABAJO EN EQUIPO',
       image: 'https://via.placeholder.com/200x100',
       recipient: {
-        name: 'Luis García',
+        name: 'Marcos Caballero',
         description: 'Siempre dispuesto a ayudar a sus compañeros y a aportar ideas.',
         profileImage: 'https://via.placeholder.com/50',
       },
