@@ -10,6 +10,7 @@ import Applications from './components/Applications';
 import Reconocemos from './components/Reconocemos';
 import RegistroUsuario from './components/RegistroUsuario';
 import HowAreYou from './components/HowAreYou';
+import PermisoTemporal from './components/PermisoTemporal';
 import { AuthProvider } from './context/AuthContext';
 import ProtectedRoute from './components/ProtectedRoute';
 
@@ -24,18 +25,9 @@ const App: React.FC = () => {
               <Route path="/login" element={<Login />} />
               <Route path="/registro" element={<RegistroUsuario />} />
               <Route path="/how-are-you" element={<ProtectedRoute><HowAreYou /></ProtectedRoute>} />
+              <Route path="/permiso-temporal" element={<ProtectedRoute><PermisoTemporal /></ProtectedRoute>} />
       
-              <Route
-                path="/"
-                element={
-                  <ProtectedRoute>
-                    <>
-                      <Stories />
-                      <Feed />
-                    </>
-                  </ProtectedRoute>
-                }
-              />
+        
               <Route
                 path="/new"
                 element={
