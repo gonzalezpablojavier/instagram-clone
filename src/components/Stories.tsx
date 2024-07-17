@@ -4,6 +4,7 @@ import React from 'react';
 const stories = [
   { id: 1, name: 'Fede', image: 'https://via.placeholder.com/50' },
   { id: 2, name: 'Marcos', image: 'https://via.placeholder.com/50' },
+  { id: 3, name: 'Edu', image: 'https://via.placeholder.com/50' },
   // Agrega más historias aquí
 ];
 
