@@ -9,7 +9,8 @@ const BottomNav: React.FC = () => {
     <nav className="bg-white fixed bottom-0 left-0 right-0 shadow-md flex justify-around p-4 z-10">
        
       <button onClick={() => navigate('/reconocemos')}>🌟</button>
-
+      <button onClick={() => navigate('/presentismo')}>📅</button> {/* Botón para Presentismo */}
+  
       <button onClick={() => navigate('/permiso-temporal')}>📝</button> {/* Botón para PermisoTemporal */}
       <button onClick={() => navigate('/how-are-you')}>🙂</button> {/* Botón para HowAreYou */}
 
