@@ -10,8 +10,11 @@ const BottomNav: React.FC = () => {
       <button onClick={() => navigate('/')}>🏠</button>     
       <button onClick={() => navigate('/reconocemos')}>🌟</button>
       <button onClick={() => navigate('/new')}>➕</button>
-      <button onClick={() => navigate('/likes')}>❤️</button>
+    
       <button onClick={() => navigate('/login')}>👤</button>
+      <button onClick={() => navigate('/registro')}>📋</button> {/* Botón de registro */}
+      <button onClick={() => navigate('/how-are-you')}>🙂</button> {/* Botón para HowAreYou */}
+
     </nav>
   );
 };
