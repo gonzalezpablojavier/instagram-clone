@@ -1,0 +1,23 @@
+// src/components/Stories.tsx
+import React from 'react';
+
+const stories = [
+  { id: 1, name: 'Fede', image: 'https://via.placeholder.com/50' },
+  { id: 2, name: 'Marcos', image: 'https://via.placeholder.com/50' },
+  // Agrega más historias aquí
+];
+
+const Stories: React.FC = () => {
+  return (
+    <div className="flex space-x-4 overflow-x-scroll p-4 bg-white shadow-md">
+      {stories.map(story => (
+        <div key={story.id} className="flex flex-col items-center">
+          <img src={story.image} alt={story.name} className="w-14 h-14 rounded-full" />
+          <p className="text-xs mt-2">{story.name}</p>
+        </div>
+      ))}
+    </div>
+  );
+};
+
+export default Stories;
