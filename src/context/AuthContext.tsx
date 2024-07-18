@@ -4,24 +4,30 @@ import { useNavigate } from 'react-router-dom';
 
 interface AuthContextType {
   isAuthenticated: boolean;
-  login: () => void;
+  login: (username: string, password: string) => boolean;
   logout: () => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const [isAuthenticated, setIsAuthenticated] = useState(true);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const navigate = useNavigate();
 
-
-  const login = () => {
-    setIsAuthenticated(true);
-   
+  const login = (username: string, password: string): boolean => {
+    // Aquí puedes agregar la lógica de autenticación real, por ejemplo, verificando las credenciales en el servidor
+    if (username === 'user' && password === 'pass') {
+      setIsAuthenticated(true);
+      navigate('/');
+      return true;
+    } else {
+      return false;
+    }
   };
 
   const logout = () => {
     setIsAuthenticated(false);
-  
+    navigate('/login');
   };
 
   return (

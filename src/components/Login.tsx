@@ -3,36 +3,45 @@ import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 
 const Login: React.FC = () => {
-  const [usuario, setUsuario] = useState('');
-  const [pass, setPass] = useState('');
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+  const [successMessage, setSuccessMessage] = useState('');
   const { login } = useAuth();
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // Aquí puedes agregar la lógica de autenticación
-    console.log(`Usuario: ${usuario}, Contraseña: ${pass}`);
-    login();
+    const success = login(username, password);
+    if (success) {
+      setSuccessMessage('Login exitoso!');
+      setError('');
+    } else {
+      setError('Credenciales inválidas');
+      setSuccessMessage('');
+    }
   };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100">
-      <form onSubmit={handleLogin} className="bg-white p-8 rounded shadow-md w-80 space-y-4">
+      <form onSubmit={handleSubmit} className="bg-white p-8 rounded shadow-md w-80 space-y-4">
         <h2 className="text-2xl mb-4">Iniciar Sesión</h2>
+        {error && <p className="text-red-500">{error}</p>}
+        {successMessage && <p className="text-green-500">{successMessage}</p>}
         <input
           type="text"
-          name="usuario"
+          name="username"
           placeholder="Usuario"
-          value={usuario}
-          onChange={(e) => setUsuario(e.target.value)}
+          value={username}
+          onChange={(e) => setUsername(e.target.value)}
           className="p-2 w-full border rounded"
           required
         />
         <input
           type="password"
-          name="pass"
+          name="password"
           placeholder="Contraseña"
-          value={pass}
-          onChange={(e) => setPass(e.target.value)}
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
           className="p-2 w-full border rounded"
           required
         />
@@ -45,3 +54,4 @@ const Login: React.FC = () => {
 };
 
 export default Login;
+
