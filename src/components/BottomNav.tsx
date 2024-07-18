@@ -11,13 +11,29 @@ const BottomNav: React.FC = () => {
        <nav className="bg-white fixed bottom-0 left-0 right-0 shadow-md flex justify-around p-4 z-10 animate__animated animate__fadeInUp">
    
       {/*<button onClick={() => navigate('/reconocemos')}>🌟</button>*/}
-      <button onClick={() => navigate('/presentismo')}>📅</button> {/* Botón para Presentismo */}
+      <div className="flex flex-col items-center" onClick={() => navigate('/presentismo')}>
+        <button>📅</button>
+        <span className="text-xs">Presentismo</span>
+      </div>
   
-      <button onClick={() => navigate('/permiso-temporal')}>📝</button> {/* Botón para PermisoTemporal */}
-      <button onClick={() => navigate('/how-are-you')}>🙂</button> {/* Botón para HowAreYou */}
+      <div className="flex flex-col items-center" onClick={() => navigate('/permiso-temporal')}>
+        <button>📝</button>
+        <span className="text-xs">Permiso</span>
+      </div>
+
+
+      <div className="flex flex-col items-center" onClick={() => navigate('/how-are-you')}>
+        <button>🙂</button>
+        <span className="text-xs">Como Estas Hoy?</span>
+      </div>
       {!isAuthenticated && <button onClick={() => navigate('/login')}>👤</button>}
      
-      <button onClick={() => navigate('/registro')}>📋</button> {/* Botón de registro */}
+
+
+      <div className="flex flex-col items-center" onClick={() => navigate('/registro')}>
+        <button>📋</button>
+        <span className="text-xs">Mi Info</span>
+      </div>
 
     </nav>
   );
