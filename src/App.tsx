@@ -24,12 +24,21 @@ const AppContent: React.FC = () => {
       <div className={`flex-grow overflow-y-auto ${isAuthenticated ? 'mt-16 mb-16' : ''}`}>
         <Routes>
           <Route path="/login" element={<Login />} />
-          <Route path="/registro" element={<RegistroUsuario />} />
+          
           <Route
             path="/how-are-you"
             element={
               <ProtectedRoute>
                 <HowAreYou />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/registro"
+            element={
+              <ProtectedRoute>
+                <RegistroUsuario />
               </ProtectedRoute>
             }
           />

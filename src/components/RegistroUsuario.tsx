@@ -52,7 +52,7 @@ const RegistroUsuario: React.FC = () => {
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-gray-100 p-4">
-      <h2 className="text-2xl mb-4">Registro de Usuario</h2>
+      <h2 className="text-2xl mb-4">Mis Datos</h2>
       {!solicitudEnviada ? (
         <form onSubmit={handleSubmit} className="bg-white p-8 rounded shadow-md w-80 space-y-4">
           <input
@@ -143,30 +143,8 @@ const RegistroUsuario: React.FC = () => {
             className="p-2 w-full border rounded"
             required
           />
-          {fotoPreview && (
-            <div className="flex justify-center mb-4">
-              <img src={fotoPreview} alt="Foto Preview" className="w-32 h-32 object-cover rounded-full" />
-            </div>
-          )}
-          <input
-            type="text"
-            name="usuario"
-            placeholder="Usuario"
-            value={formData.usuario}
-            onChange={handleChange}
-            className="p-2 w-full border rounded"
-            required
-          />
-          <input
-            type="password"
-            name="pass"
-            placeholder="Contraseña"
-            value={formData.pass}
-            onChange={handleChange}
-            className="p-2 w-full border rounded"
-            required
-          />
-          <input
+
+         <input
             type="email"
             name="email"
             placeholder="Email"
@@ -175,6 +153,14 @@ const RegistroUsuario: React.FC = () => {
             className="p-2 w-full border rounded"
             required
           />
+          {fotoPreview && (
+            <div className="flex justify-center mb-4">
+              <img src={fotoPreview} alt="Foto Preview" className="w-32 h-32 object-cover rounded-full" />
+            </div>
+          )}
+      
+      
+     
           <button type="submit" className="w-full bg-blue-500 text-white p-2 rounded">
             Enviar Solicitud
           </button>

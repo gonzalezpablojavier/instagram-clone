@@ -1,5 +1,5 @@
 // src/context/AuthContext.tsx
-import React, { createContext, useContext, useState, ReactNode } from 'react';
+import React, { createContext, useContext, useState,useEffect, ReactNode } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 interface AuthContextType {
@@ -11,8 +11,18 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(() => {
+    const savedAuth = localStorage.getItem('isAuthenticated');
+    return savedAuth ? JSON.parse(savedAuth) : false;
+  });
+
   const navigate = useNavigate();
+
+
+  useEffect(() => {
+    localStorage.setItem('isAuthenticated', JSON.stringify(isAuthenticated));
+  }, [isAuthenticated]);
+
 
   const login = (username: string, password: string): boolean => {
     // Aquí puedes agregar la lógica de autenticación real, por ejemplo, verificando las credenciales en el servidor
