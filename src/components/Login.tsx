@@ -27,7 +27,7 @@ const Login: React.FC = () => {
 
       <form 
         onSubmit={handleSubmit} 
-        className="bg-white p-8 rounded shadow-md w-80 space-y-4 animate__animated animate__fadeIn"
+        className="bg-white p-8 rounded shadow-md w-80 space-y-4 animate__animated animate__backInRight"
       >
         <h2 className="text-2xl mb-4">Iniciar Sesión</h2>
         {error && <p className="text-red-500">{error}</p>}
