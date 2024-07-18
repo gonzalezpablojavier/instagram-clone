@@ -66,22 +66,8 @@ const AppContent: React.FC = () => {
               </ProtectedRoute>
             }
           />
-          <Route
-            path="/new"
-            element={
-              <ProtectedRoute>
-                <Applications />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/reconocemos"
-            element={
-              <ProtectedRoute>
-                <Reconocemos />
-              </ProtectedRoute>
-            }
-          />
+       
+        
           <Route path="*" element={<Navigate to="/login" />} />
         </Routes>
       </div>
