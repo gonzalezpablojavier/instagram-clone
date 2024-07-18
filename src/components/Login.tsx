@@ -23,7 +23,10 @@ const Login: React.FC = () => {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100">
-      <form onSubmit={handleSubmit} className="bg-white p-8 rounded shadow-md w-80 space-y-4">
+      <form 
+        onSubmit={handleSubmit} 
+        className="bg-white p-8 rounded shadow-md w-80 space-y-4 animate__animated animate__fadeIn"
+      >
         <h2 className="text-2xl mb-4">Iniciar Sesión</h2>
         {error && <p className="text-red-500">{error}</p>}
         {successMessage && <p className="text-green-500">{successMessage}</p>}
@@ -54,4 +57,3 @@ const Login: React.FC = () => {
 };
 
 export default Login;
-

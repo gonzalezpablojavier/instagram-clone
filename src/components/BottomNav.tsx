@@ -7,8 +7,9 @@ const BottomNav: React.FC = () => {
   const { isAuthenticated } = useAuth();
 
   return (
-    <nav className="bg-white fixed bottom-0 left-0 right-0 shadow-md flex justify-around p-4 z-10">
-       
+
+       <nav className="bg-white fixed bottom-0 left-0 right-0 shadow-md flex justify-around p-4 z-10 animate__animated animate__fadeInUp">
+   
       {/*<button onClick={() => navigate('/reconocemos')}>🌟</button>*/}
       <button onClick={() => navigate('/presentismo')}>📅</button> {/* Botón para Presentismo */}
   
