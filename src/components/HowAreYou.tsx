@@ -18,7 +18,7 @@ const HowAreYou: React.FC = () => {
   const handleMoodClick = async (selectedMood: string) => {
     setMood(selectedMood);
     try {
-      const response = await axios.post('http://localhost:3000/howareyou', { mood: selectedMood, colaboradorID });
+      const response = await axios.post('https://elated-kowalevski.51-222-158-198.plesk.page/howareyou', { mood: selectedMood, colaboradorID });
       if (response.status === 201) {
         setMessage('Estado de ánimo guardado correctamente');
       }
