@@ -1,8 +1,8 @@
 import axios from 'axios';
 
 const apiClient = axios.create({
-  baseURL: process.env.REACT_APP_API_URL, // URL del backend
-  withCredentials: true, // Asegúrate de que esto esté configurado si estás usando cookies
+  baseURL: 'https://elated-kowalevski.51-222-158-198.plesk.page',
+  withCredentials: true, // Asegura que las credenciales se envíen con cada solicitud
   headers: {
     'Content-Type': 'application/json',
   },

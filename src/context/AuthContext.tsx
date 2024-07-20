@@ -38,12 +38,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 //elated-kowalevski.51-222-158-198.plesk.page
   const login = async (username: string, password: string): Promise<boolean> => {
     try {
-      const response = await apiClient.post('/auth/login', { username, password }, {
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        withCredentials: true
-      });
+      const response = await apiClient.post('/auth/login', { username, password });
       if (response.status === 201) {
         const { colaboradorID, nombreUsuario } = response.data;
         setUser({ username: nombreUsuario });
