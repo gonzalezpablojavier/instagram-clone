@@ -12,18 +12,18 @@ const BottomNav: React.FC = () => {
    
       {/*<button onClick={() => navigate('/reconocemos')}>🌟</button>*/}
       <div className="flex flex-col items-center" onClick={() => navigate('/presentismo')}>
-        <button>📅</button>
+      <button className=' text-2xl'>📅</button>
         <span className="text-xs">Presentismo</span>
       </div>
   
       <div className="flex flex-col items-center" onClick={() => navigate('/permiso-temporal')}>
-        <button>📝</button>
+      <button className=' text-2xl'>📝</button>
         <span className="text-xs">Permiso</span>
       </div>
 
 
       <div className="flex flex-col items-center" onClick={() => navigate('/how-are-you')}>
-        <button>🙂</button>
+        <button className=' text-2xl'>🙂</button>       
         <span className="text-xs">Como Estas Hoy?</span>
       </div>
       {!isAuthenticated && <button onClick={() => navigate('/login')}>👤</button>}
@@ -31,7 +31,7 @@ const BottomNav: React.FC = () => {
 
 
       <div className="flex flex-col items-center" onClick={() => navigate('/registro')}>
-        <button>📋</button>
+      <button className=' text-2xl'>📋</button>
         <span className="text-xs">Mi Info</span>
       </div>
 

@@ -1,54 +1,45 @@
-// src/components/HowAreYou.tsx
-import React, { useState } from 'react';
-
-const moodOptions = [
-  { mood: 'Contento', icon: '😊' },
-  { mood: 'Triste', icon: '😢' },
-  { mood: 'Enojado', icon: '😠' },
-  { mood: 'Super', icon: '😎' },
-  { mood: 'No quiero decirlo', icon: '🤐' },
-];
+import React, { useState,useEffect } from 'react';
+import axios from 'axios';
 
 const HowAreYou: React.FC = () => {
-  const [selectedMood, setSelectedMood] = useState<string | null>(null);
-  const [date, setDate] = useState<string>(new Date().toLocaleDateString());
+  const [mood, setMood] = useState<string | null>(null);
+  const [colaboradorID, setColaboradorID] = useState<string | null>(null);
+  const [message, setMessage] = useState<string | null>(null);
 
-  const handleMoodSelect = (mood: string) => {
-    setSelectedMood(mood);
-  };
 
-  const handleSubmit = () => {
-    if (selectedMood) {
-      console.log(`Mood: ${selectedMood}, Date: ${date}`);
-      // Aquí puedes agregar la lógica para enviar los datos al servidor
-      alert(`Estado de ánimo guardado: ${selectedMood} en la fecha: ${date}`);
-    } else {
-      alert('Por favor selecciona un estado de ánimo.');
+
+  useEffect(() => {
+    const storedColaboradorID = localStorage.getItem('colaboradorID');
+    if (storedColaboradorID) {
+      setColaboradorID(storedColaboradorID);
+    }
+  }, []);
+
+  const handleMoodClick = async (selectedMood: string) => {
+    setMood(selectedMood);
+    try {
+      const response = await axios.post('http://localhost:3000/howareyou', { mood: selectedMood, colaboradorID });
+      if (response.status === 201) {
+        setMessage('Estado de ánimo guardado correctamente');
+      }
+    } catch (error) {
+      setMessage('Error al guardar el estado de ánimo');
+      console.error(error);
     }
   };
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-gray-100 p-4">
-      <h2 className="text-2xl mb-4">¿Cómo te sientes hoy?</h2>
+      <h2 className="text-2xl mb-4">¿Cómo te sentis hoy?</h2>
       <div className="flex space-x-4 mb-4">
-        {moodOptions.map((option) => (
-          <button
-            key={option.mood}
-            onClick={() => handleMoodSelect(option.mood)}
-            className={`p-4 rounded-full text-3xl ${
-              selectedMood === option.mood ? 'bg-blue-300' : 'bg-gray-200'
-            }`}
-          >
-            {option.icon}
-          </button>
-        ))}
+        <button onClick={() => handleMoodClick('super')} className="text-4xl">😎</button>
+        <button onClick={() => handleMoodClick('contento')} className="text-4xl">😊</button>
+        <button onClick={() => handleMoodClick('triste')} className="text-4xl">😢</button>
+        <button onClick={() => handleMoodClick('enojado')} className="text-4xl">😠</button>  
+        <button onClick={() => handleMoodClick('no quiero decirlo')} className="text-4xl">🤐</button>
       </div>
-      <button
-        onClick={handleSubmit}
-        className="mt-4 bg-blue-500 text-white p-2 rounded"
-      >
-        Grabar Estado
-      </button>
+      {mood && <p className="text-xl">Seleccionaste: {mood}</p>}
+      {message && <p className="text-green-500 mt-4">{message}</p>}
     </div>
   );
 };

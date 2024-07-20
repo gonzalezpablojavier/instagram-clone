@@ -1,4 +1,3 @@
-// src/components/Login.tsx
 import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 
@@ -9,9 +8,9 @@ const Login: React.FC = () => {
   const [successMessage, setSuccessMessage] = useState('');
   const { login } = useAuth();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const success = login(username, password);
+    const success = await login(username, password);
     if (success) {
       setSuccessMessage('Login exitoso!');
       setError('');
@@ -22,9 +21,7 @@ const Login: React.FC = () => {
   };
 
   return (
-  
-      <div className="min-h-screen flex items-center justify-center bg-login-background bg-cover bg-center">
-
+    <div className="min-h-screen flex items-center justify-center bg-login-background bg-cover bg-center">
       <form 
         onSubmit={handleSubmit} 
         className="bg-white p-8 rounded shadow-md w-80 space-y-4 animate__animated animate__backInRight"

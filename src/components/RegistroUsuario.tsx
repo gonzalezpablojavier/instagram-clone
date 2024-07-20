@@ -1,5 +1,5 @@
-// src/components/RegistroUsuario.tsx
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 
 const initialState = {
   nombre: '',
@@ -12,7 +12,7 @@ const initialState = {
   area: '',
   cuil: '',
   foto: '',
-  usuario: '',
+  colaboradorID: '',
   pass: '',
   email: '',
 };
@@ -21,7 +21,31 @@ const RegistroUsuario: React.FC = () => {
   const [formData, setFormData] = useState(initialState);
   const [solicitudEnviada, setSolicitudEnviada] = useState(false);
   const [fotoPreview, setFotoPreview] = useState<string | null>(null);
+  const [colaboradorIDExiste, setColaboradorIDExiste] = useState(false);
 
+  useEffect(() => {
+    const colaboradorID = localStorage.getItem('colaboradorID');
+    if (colaboradorID) {
+      setFormData((prevData) => ({ ...prevData, colaboradorID }));
+      verificarColaboradorID(colaboradorID);
+    }
+  }, []);
+
+  const verificarColaboradorID = async (colaboradorID: string) => {
+    try {
+      const response = await axios.get(`http://localhost:3000/usuarios-registrados/${colaboradorID}`);
+      if (response.data.ok === 1) {
+        setFormData(response.data.data);
+        setColaboradorIDExiste(true);
+      } else {
+        console.log('No se encontró el colaboradorID, se creará uno nuevo.');
+        setColaboradorIDExiste(false);
+      }
+    } catch (error) {
+      console.error('Error al verificar el colaboradorID:', error);
+      setColaboradorIDExiste(false);
+    }
+  };
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setFormData((prevData) => ({ ...prevData, [name]: value }));
@@ -39,11 +63,20 @@ const RegistroUsuario: React.FC = () => {
     }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log('Registro enviado:', formData);
-    setSolicitudEnviada(true);
-    // Aquí puedes agregar la lógica para enviar los datos al servidor
+    try {
+      if (colaboradorIDExiste) {
+        // Actualizar datos del usuario
+        await axios.put(`http://localhost:3000/usuarios-registrados/${formData.colaboradorID}`, formData);
+      } else {
+        // Crear nuevo usuario
+        await axios.post('http://localhost:3000/usuarios-registrados/create-if-not-exists/', formData);
+      }
+      setSolicitudEnviada(true);
+    } catch (error) {
+      console.error('Error al enviar la solicitud:', error);
+    }
   };
 
   const handleEdit = () => {
@@ -73,6 +106,7 @@ const RegistroUsuario: React.FC = () => {
             className="p-2 w-full border rounded"
             required
           />
+          
           <input
             type="date"
             name="fechaNacimiento"
@@ -141,10 +175,9 @@ const RegistroUsuario: React.FC = () => {
             accept="image/*"
             onChange={handleFileChange}
             className="p-2 w-full border rounded"
-            required
+            
           />
-
-         <input
+          <input
             type="email"
             name="email"
             placeholder="Email"
@@ -158,9 +191,6 @@ const RegistroUsuario: React.FC = () => {
               <img src={fotoPreview} alt="Foto Preview" className="w-32 h-32 object-cover rounded-full" />
             </div>
           )}
-      
-      
-     
           <button type="submit" className="w-full bg-blue-500 text-white p-2 rounded">
             Enviar Solicitud
           </button>
@@ -182,7 +212,6 @@ const RegistroUsuario: React.FC = () => {
               <img src={formData.foto} alt="Foto" className="w-32 h-32 object-cover rounded-full" />
             </div>
           )}
-          <p><strong>Usuario:</strong> {formData.usuario}</p>
           <p><strong>Email:</strong> {formData.email}</p>
           <button
             onClick={handleEdit}
@@ -197,4 +226,3 @@ const RegistroUsuario: React.FC = () => {
 };
 
 export default RegistroUsuario;
-

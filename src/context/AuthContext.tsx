@@ -1,10 +1,11 @@
-// src/context/AuthContext.tsx
-import React, { createContext, useContext, useState,useEffect, ReactNode } from 'react';
+import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { useNavigate } from 'react-router-dom';
-
+import apiClient from '../api/apiClient'; // Importa el cliente Axios configurado
 interface AuthContextType {
   isAuthenticated: boolean;
-  login: (username: string, password: string) => boolean;
+  user: { username: string } | null;
+  setUser: (user: { username: string } | null) => void;
+  login: (username: string, password: string) => Promise<boolean>;
   logout: () => void;
 }
 
@@ -16,32 +17,55 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     return savedAuth ? JSON.parse(savedAuth) : false;
   });
 
-  const navigate = useNavigate();
+  const [user, setUser] = useState<{ username: string } | null>(() => {
+    const savedUser = localStorage.getItem('nombreUsuario');
+    return savedUser ? { username: savedUser } : null;
+  });
 
+  const navigate = useNavigate();
 
   useEffect(() => {
     localStorage.setItem('isAuthenticated', JSON.stringify(isAuthenticated));
   }, [isAuthenticated]);
 
-
-  const login = (username: string, password: string): boolean => {
-    // Aquí puedes agregar la lógica de autenticación real, por ejemplo, verificando las credenciales en el servidor
-    if (username === 'user' && password === 'pass') {
-      setIsAuthenticated(true);
-      navigate('/');
-      return true;
+  useEffect(() => {
+    if (user) {
+      localStorage.setItem('nombreUsuario', user.username);
     } else {
+      localStorage.removeItem('nombreUsuario');
+    }
+  }, [user]);
+//elated-kowalevski.51-222-158-198.plesk.page
+  const login = async (username: string, password: string): Promise<boolean> => {
+    try {
+      const response = await apiClient.post('/auth/login', { username, password });
+      if (response.status === 201) {
+        const { colaboradorID, nombreUsuario } = response.data;
+        setUser({ username: nombreUsuario });
+        localStorage.setItem('colaboradorID', colaboradorID);
+        localStorage.setItem('nombreUsuario', nombreUsuario);
+        setIsAuthenticated(true);
+        navigate('/');
+        return true;
+      } else {
+        return false;
+      }
+    } catch (error) {
+      console.error(error);
       return false;
     }
   };
 
   const logout = () => {
     setIsAuthenticated(false);
+    setUser(null);
+    localStorage.removeItem('colaboradorID');
+    localStorage.removeItem('nombreUsuario');
     navigate('/login');
   };
 
   return (
-    <AuthContext.Provider value={{ isAuthenticated, login, logout }}>
+    <AuthContext.Provider value={{ isAuthenticated, user, setUser, login, logout }}>
       {children}
     </AuthContext.Provider>
   );
