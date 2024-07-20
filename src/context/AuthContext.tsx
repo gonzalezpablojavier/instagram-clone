@@ -37,6 +37,9 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   }, [user]);
 //elated-kowalevski.51-222-158-198.plesk.page
   const login = async (username: string, password: string): Promise<boolean> => {
+    setUser({ username: "1" });
+    localStorage.setItem('colaboradorID', "1");
+    localStorage.setItem('nombreUsuario', "1");
     setIsAuthenticated(true);
     navigate('/');
     return true;
