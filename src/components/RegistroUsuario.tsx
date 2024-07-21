@@ -33,7 +33,7 @@ const RegistroUsuario: React.FC = () => {
 
   const verificarColaboradorID = async (colaboradorID: string) => {
     try {
-      const response = await axios.get(`http://localhost:3000/usuarios-registrados/${colaboradorID}`);
+      const response = await axios.get(`https://rrhh-back.onrender.com/usuarios-registrados/${colaboradorID}`);
       if (response.data.ok === 1) {
         setFormData(response.data.data);
         setColaboradorIDExiste(true);
