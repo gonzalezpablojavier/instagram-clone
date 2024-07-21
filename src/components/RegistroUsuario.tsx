@@ -68,10 +68,10 @@ const RegistroUsuario: React.FC = () => {
     try {
       if (colaboradorIDExiste) {
         // Actualizar datos del usuario
-        await axios.put(`http://localhost:3000/usuarios-registrados/${formData.colaboradorID}`, formData);
+        await axios.put(`https://rrhh-back.onrender.com/usuarios-registrados/${formData.colaboradorID}`, formData);
       } else {
         // Crear nuevo usuario
-        await axios.post('http://localhost:3000/usuarios-registrados/create-if-not-exists/', formData);
+        await axios.post('https://rrhh-back.onrender.com/usuarios-registrados/create-if-not-exists/', formData);
       }
       setSolicitudEnviada(true);
     } catch (error) {
