@@ -14,7 +14,8 @@ import PermisoTemporal from './components/PermisoTemporal';
 import Presentismo from './components/Presentismo';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import ProtectedRoute from './components/ProtectedRoute';
-
+import ManageMoods from './components/ManageMoods';
+import Home from './components/Home';
 const AppContent: React.FC = () => {
   const { isAuthenticated } = useAuth();
 
@@ -24,7 +25,18 @@ const AppContent: React.FC = () => {
       <div className={`flex-grow overflow-y-auto ${isAuthenticated ? 'mt-16 mb-16' : ''}`}>
         <Routes>
           <Route path="/login" element={<Login />} />
-          
+
+
+          <Route
+            path="/Home"
+            element={
+              <ProtectedRoute>
+                <Home />
+              </ProtectedRoute>
+            }
+          />
+
+
           <Route
             path="/how-are-you"
             element={
@@ -39,6 +51,15 @@ const AppContent: React.FC = () => {
             element={
               <ProtectedRoute>
                 <RegistroUsuario />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/ManageMoods"
+            element={
+              <ProtectedRoute>
+                <ManageMoods />
               </ProtectedRoute>
             }
           />
@@ -62,7 +83,7 @@ const AppContent: React.FC = () => {
             path="/"
             element={
               <ProtectedRoute>
-                   <HowAreYou />
+                   <Home />
               </ProtectedRoute>
             }
           />

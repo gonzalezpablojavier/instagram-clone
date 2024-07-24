@@ -22,7 +22,7 @@ const RegistroUsuario: React.FC = () => {
   const [solicitudEnviada, setSolicitudEnviada] = useState(false);
   const [fotoPreview, setFotoPreview] = useState<string | null>(null);
   const [colaboradorIDExiste, setColaboradorIDExiste] = useState(false);
-
+  const API_URL = process.env.REACT_APP_API_URL;
   useEffect(() => {
     const colaboradorID = localStorage.getItem('colaboradorID');
     if (colaboradorID) {
@@ -33,7 +33,7 @@ const RegistroUsuario: React.FC = () => {
 
   const verificarColaboradorID = async (colaboradorID: string) => {
     try {
-      const response = await axios.get(`https://rrhh-back.onrender.com/usuarios-registrados/${colaboradorID}`);
+      const response = await axios.get(`${API_URL}/usuarios-registrados/${colaboradorID}`);
       if (response.data.ok === 1) {
         setFormData(response.data.data);
         setColaboradorIDExiste(true);
@@ -46,6 +46,7 @@ const RegistroUsuario: React.FC = () => {
       setColaboradorIDExiste(false);
     }
   };
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setFormData((prevData) => ({ ...prevData, [name]: value }));
@@ -67,11 +68,9 @@ const RegistroUsuario: React.FC = () => {
     e.preventDefault();
     try {
       if (colaboradorIDExiste) {
-        // Actualizar datos del usuario
-        await axios.put(`https://rrhh-back.onrender.com/usuarios-registrados/${formData.colaboradorID}`, formData);
+        await axios.put(`${API_URL}/usuarios-registrados/${formData.colaboradorID}`, formData);
       } else {
-        // Crear nuevo usuario
-        await axios.post('https://rrhh-back.onrender.com/usuarios-registrados/create-if-not-exists/', formData);
+        await axios.post(`${API_URL}/usuarios-registrados/create-if-not-exists/`, formData);
       }
       setSolicitudEnviada(true);
     } catch (error) {
@@ -85,59 +84,46 @@ const RegistroUsuario: React.FC = () => {
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-gray-100 p-4">
-      <h2 className="text-2xl mb-4">Mis Datos</h2>
+    
       {!solicitudEnviada ? (
-        <form onSubmit={handleSubmit} className="bg-white p-8 rounded shadow-md w-80 space-y-4">
+        <form onSubmit={handleSubmit} className="bg-gray-100 p-8 rounded-lg  w-full max-w-lg space-y-4">
+          <div className="flex items-center">
+            <div className="flex flex-col items-center">
+              {fotoPreview ? (
+                <img src={fotoPreview} alt="Foto Preview" className="w-24 h-24 object-cover rounded-full mb-2" />
+              ) : (
+                <div className="w-24 h-24 bg-gray-300 flex items-center justify-center rounded-full mb-2">
+                  <span className="text-gray-500">subir foto</span>
+                </div>
+              )}
+              <input type="file" name="foto" accept="image/*" onChange={handleFileChange} className="text-xs" />
+            </div>
+            <div className="ml-4 flex flex-col space-y-2 rounded-lg">
+              <input
+                type="text"
+                name="nombre"
+                placeholder="Nombre"
+                value={formData.nombre}
+                onChange={handleChange}
+                className="p-2 border rounded w-full"
+                required
+              />
+              <input
+                type="text"
+                name="apellido"
+                placeholder="Apellido"
+                value={formData.apellido}
+                onChange={handleChange}
+                className="p-2 border rounded w-full"
+                required
+              />
+            </div>
+          </div>
           <input
             type="text"
-            name="nombre"
-            placeholder="Nombre"
-            value={formData.nombre}
-            onChange={handleChange}
-            className="p-2 w-full border rounded"
-            required
-          />
-          <input
-            type="text"
-            name="apellido"
-            placeholder="Apellido"
-            value={formData.apellido}
-            onChange={handleChange}
-            className="p-2 w-full border rounded"
-            required
-          />
-          
-          <input
-            type="date"
-            name="fechaNacimiento"
-            placeholder="Fecha de Nacimiento"
-            value={formData.fechaNacimiento}
-            onChange={handleChange}
-            className="p-2 w-full border rounded"
-            required
-          />
-          <textarea
-            name="miFamilia"
-            placeholder="Mi Familia"
-            value={formData.miFamilia}
-            onChange={handleChange}
-            className="p-2 w-full border rounded"
-            required
-          />
-          <input
-            type="text"
-            name="direccion"
-            placeholder="Dirección"
-            value={formData.direccion}
-            onChange={handleChange}
-            className="p-2 w-full border rounded"
-            required
-          />
-          <input
-            type="text"
-            name="localidad"
-            placeholder="Localidad"
-            value={formData.localidad}
+            name="area"
+            placeholder="Área"
+            value={formData.area}
             onChange={handleChange}
             className="p-2 w-full border rounded"
             required
@@ -152,32 +138,6 @@ const RegistroUsuario: React.FC = () => {
             required
           />
           <input
-            type="text"
-            name="area"
-            placeholder="Área"
-            value={formData.area}
-            onChange={handleChange}
-            className="p-2 w-full border rounded"
-            required
-          />
-          <input
-            type="text"
-            name="cuil"
-            placeholder="CUIL"
-            value={formData.cuil}
-            onChange={handleChange}
-            className="p-2 w-full border rounded"
-            required
-          />
-          <input
-            type="file"
-            name="foto"
-            accept="image/*"
-            onChange={handleFileChange}
-            className="p-2 w-full border rounded"
-            
-          />
-          <input
             type="email"
             name="email"
             placeholder="Email"
@@ -186,17 +146,47 @@ const RegistroUsuario: React.FC = () => {
             className="p-2 w-full border rounded"
             required
           />
-          {fotoPreview && (
-            <div className="flex justify-center mb-4">
-              <img src={fotoPreview} alt="Foto Preview" className="w-32 h-32 object-cover rounded-full" />
-            </div>
-          )}
+          <input
+            type="date"
+            name="fechaNacimiento"
+            placeholder="Cumpleaños"
+            value={formData.fechaNacimiento}
+            onChange={handleChange}
+            className="p-2 w-full border rounded"
+            required
+          />
+          <input
+            type="text"
+            name="cuil"
+            placeholder="DNI"
+            value={formData.cuil}
+            onChange={handleChange}
+            className="p-2 w-full border rounded"
+            required
+          />
+          <input
+            type="text"
+            name="direccion"
+            placeholder="Dirección"
+            value={formData.direccion}
+            onChange={handleChange}
+            className="p-2 w-full border rounded"
+            required
+          />
+          <textarea
+            name="miFamilia"
+            placeholder="Más sobre mi"
+            value={formData.miFamilia}
+            onChange={handleChange}
+            className="p-2 w-full border rounded"
+            required
+          />
           <button type="submit" className="w-full bg-blue-500 text-white p-2 rounded">
-            Enviar Solicitud
+            Enviar
           </button>
         </form>
       ) : (
-        <div className="bg-white p-8 rounded shadow-md w-80 space-y-4">
+        <div className="bg-white p-8 rounded-lg shadow-lg w-full max-w-lg space-y-4">
           <h3 className="text-xl mb-4">Datos del Registro</h3>
           <p><strong>Nombre:</strong> {formData.nombre}</p>
           <p><strong>Apellido:</strong> {formData.apellido}</p>
@@ -217,7 +207,7 @@ const RegistroUsuario: React.FC = () => {
             onClick={handleEdit}
             className="w-full bg-yellow-500 text-white p-2 rounded mt-4"
           >
-            Editar Datos
+            Editar
           </button>
         </div>
       )}

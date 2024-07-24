@@ -1,23 +1,22 @@
-import React, { useState } from 'react';
-import QrScanner from 'react-qr-scanner';
+import React, { useState, useRef, useEffect } from 'react';
+import { BrowserMultiFormatReader } from '@zxing/library';
 
 const Presentismo: React.FC = () => {
   const [scanResult, setScanResult] = useState<string | null>(null);
   const [retryCount, setRetryCount] = useState<number>(0);
   const [estado, setEstado] = useState<'ausente' | 'presente'>('ausente');
-  const [showQR, setShowQR] = useState(false);
+  const [isScanning, setIsScanning] = useState<boolean>(false);
+  const videoRef = useRef<HTMLVideoElement | null>(null);
 
-  const handleScan = (data: string | null) => {
-    if (data) {
-      setScanResult(data);
-      if (validateQrCode(data)) {
-        setEstado('presente');
-        alert('Presente marcado correctamente');
-        setShowQR(false); // Ocultar el lector QR después de un escaneo exitoso
-      } else {
-        alert('Código QR inválido. Inténtelo de nuevo.');
-        handleRetry();
-      }
+  const handleScan = (data: string) => {
+    setScanResult(data);
+    if (validateQrCode(data)) {
+      setEstado('presente');
+      alert('Presente marcado correctamente');
+      setIsScanning(false); // Stop scanning after successful scan
+    } else {
+      alert('Código QR inválido. Inténtelo de nuevo.');
+      handleRetry();
     }
   };
 
@@ -33,6 +32,7 @@ const Presentismo: React.FC = () => {
         return prev + 1;
       } else {
         alert('Se ha alcanzado el límite de intentos.');
+        setIsScanning(false); // Stop scanning after reaching retry limit
         return prev;
       }
     });
@@ -43,48 +43,76 @@ const Presentismo: React.FC = () => {
     return code === 'expected_qr_code_value';
   };
 
+  const handleStartScanning = async () => {
+    setIsScanning(true);
+    if (videoRef.current) {
+      try {
+        const codeReader = new BrowserMultiFormatReader();
+        const stream = await navigator.mediaDevices.getUserMedia({
+          video: { facingMode: 'user' },
+        });
+        videoRef.current.srcObject = stream;
+        videoRef.current.play();
+        
+        codeReader.decodeFromVideoDevice(null, videoRef.current, (result, err) => {
+          if (result) {
+            handleScan(result.getText());
+          }
+          if (err) {
+            handleError(err);
+          }
+        });
+      } catch (err) {
+        console.error('Error accessing the camera:', err);
+        alert('No se pudo acceder a la cámara. Inténtelo de nuevo.');
+      }
+    }
+  };
+
+  const handleStopScanning = () => {
+    setIsScanning(false);
+    if (videoRef.current && videoRef.current.srcObject) {
+      const stream = videoRef.current.srcObject as MediaStream;
+      const tracks = stream.getTracks();
+      tracks.forEach((track) => track.stop());
+    }
+  };
+
   const previewStyle = {
     height: 240,
     width: 320,
   };
 
-  const videoConstraints = {
-    facingMode: 'environment',
-  };
-
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-gray-100 p-4">
-      <h2 className="text-2xl mb-4">Marcar Presentismo</h2>
+    <div className="flex flex-col items-center justify-center bg-gray-100 p-4 rounded">
       {estado === 'ausente' ? (
         <>
-          {showQR ? (
-            <div className="w-full max-w-sm">
-              <QrScanner
-                delay={300}
-                style={previewStyle}
-                onError={handleError}
-                onScan={handleScan}
-            
-              />
-              <button
-                onClick={() => setShowQR(false)}
-                className="bg-red-500 text-white p-2 rounded mt-4"
-              >
-                Cerrar Lector QR
+          {isScanning ? (
+            <>
+              <video ref={videoRef} style={previewStyle} />
+              <button onClick={handleStopScanning} className="mt-4 bg-red-500 text-white p-2 rounded">
+                Cancelar
               </button>
-            </div>
+              <p className="mt-4">Intentos restantes: {10 - retryCount}</p>
+            </>
           ) : (
             <button
-              onClick={() => setShowQR(true)}
-              className="bg-blue-500 text-white p-2 rounded"
+              onClick={handleStartScanning}
+              className="w-32 h-32 rounded-full"
+              style={{ backgroundImage: "url('/images/qr-code.png')" }}
             >
-              Abrir Lector QR
+              {/* Button content (e.g., an icon or text) */}
             </button>
           )}
-          <p className="mt-4">Intentos restantes: {10 - retryCount}</p>
         </>
       ) : (
         <p className="text-xl">Estado: Presente</p>
+      )}
+      {scanResult && (
+        <div className="mt-4 p-4 bg-white shadow rounded">
+          <p className="text-lg">Resultado del escaneo:</p>
+          <p className="text-md">{scanResult}</p>
+        </div>
       )}
     </div>
   );

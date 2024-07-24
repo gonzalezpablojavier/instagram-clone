@@ -21,21 +21,23 @@ const Login: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-login-background bg-cover bg-center">
-      <form 
+    <div className="min-h-screen flex items-center justify-center bg-cyan-600 bg-cover bg-center">
+     
+          <form 
         onSubmit={handleSubmit} 
-        className="bg-white p-8 rounded shadow-md w-80 space-y-4 animate__animated animate__backInRight"
+        className="bg-cyan-600 p-8 rounded-lg  w-80 space-y-4 animate__animated animate__backInRight"
       >
-        <h2 className="text-2xl mb-4">Iniciar Sesión</h2>
+      
         {error && <p className="text-red-500">{error}</p>}
         {successMessage && <p className="text-green-500">{successMessage}</p>}
+        <img src="/images/logo-head.png" alt="Logo" className="mx-auto mb-8" />
         <input
           type="text"
           name="username"
           placeholder="Usuario"
           value={username}
           onChange={(e) => setUsername(e.target.value)}
-          className="p-2 w-full border rounded"
+          className="w-full p-2 rounded-lg border border-gray-300 bg-gray-200 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-600 font-montserrat"
           required
         />
         <input
@@ -44,14 +46,15 @@ const Login: React.FC = () => {
           placeholder="Contraseña"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
-          className="p-2 w-full border rounded"
+          className="w-full p-2 rounded-lg border border-gray-300 bg-gray-200 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-600 font-montserrat"
           required
         />
-        <button type="submit" className="w-full bg-blue-500 text-white p-2 rounded">
-          Iniciar Sesión
+        <button type="submit" className="w-full p-2 rounded-lg bg-white text-blue-600 font-semibold hover:bg-blue-600 hover:text-white transition duration-200 font-montserrat">
+          Iniciar
         </button>
       </form>
     </div>
+   
   );
 };
 

@@ -3,9 +3,11 @@ module.exports = {
   darkMode: false, // or 'media' or 'class'
   theme: {
     extend: {
-      backgroundImage: theme => ({
-        'login-background': "url(https://distrisuperapis.com.ar/bandera.jpg)",
-      }),
+      fontFamily: {
+        'montserrat': ['Montserrat'],
+        'lato': ['Lato'],
+        'garamond': ['Garamond']
+    }
     },
   },
   variants: {

@@ -1,11 +1,8 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-header
-{
-  background-color: #2991d6;
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&family=Lato:wght@400;700&family=Garamond:wght@400;700&display=swap');
 
-}
 body {
   margin: 0;
   padding-top: 64px; /* Altura del Header */
@@ -14,9 +11,14 @@ body {
 }
 
 html, body, #root {
-  height: 80%;
+  height: 100%;
+  background-color: #f3f4f6;
 }
 
 .min-h-screen {
-  min-height: calc(100vh - 128px); /* Resta la altura del Header y del BottomNav */
+ /* min-height: calc(100vh - 128px);  Resta la altura del Header y del BottomNav */
+}
+/* Personalizar fuente */
+h2 {
+  font-family: 'Montserrat','Roboto', sans-serif;
 }
