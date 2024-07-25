@@ -50,7 +50,7 @@ const HowAreYou: React.FC = () => {
           <span className="text-xs">MAL</span>
         </div>
       </div>
-      {mood && <p className="text-xl">Seleccionaste: {mood}</p>}
+      
       {message && <p className="text-green-500 mt-4">{message}</p>}
       
       <h2 className="text-2xl mt-8 mb-4 font-semibold font-montserrat">¿Ya llegaste?</h2>
