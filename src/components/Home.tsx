@@ -88,9 +88,7 @@ const Home: React.FC = () => {
     <div className="min-h-screen flex flex-col items-center justify-center bg-gray-100 p-4">
    
       <main className="flex-grow mt-16 w-full max-w-5xl mx-auto">
-        <h1 className="text-xl font-bold mb-4 font-montserrat">Home</h1>
-
-
+       
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           <div className="bg-cyan-600 text-white p-4 rounded shadow flex items-center justify-center">
             {profile ? <img src="/images/winner.png" alt="Perfil" className="w-24 h-24 object-cover rounded-full"/>  : 'Foto de perfil'}       
