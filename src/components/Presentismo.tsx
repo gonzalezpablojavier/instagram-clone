@@ -16,28 +16,39 @@ const Presentismo: React.FC = () => {
     console.warn(`Error scanning QR code: ${error}`);
   };
 
-  const startScanning = () => {
-    setIsScanning(true);
-    if (!scannerRef.current) {
-      scannerRef.current = new Html5Qrcode("reader");
+  const startScanning = async () => {
+    try {
+      if (!scannerRef.current) {
+        scannerRef.current = new Html5Qrcode("reader");
+      }
+
+      const devices = await Html5Qrcode.getCameras();
+      if (devices && devices.length) {
+        const cameraId = devices[devices.length - 1].id; // Typically, the last camera is the back camera
+        await scannerRef.current.start(
+          cameraId,
+          {
+            fps: 10,
+            qrbox: { width: 250, height: 250 }
+          },
+          handleScanSuccess,
+          handleScanFailure
+        );
+        setIsScanning(true);
+      } else {
+        console.error('No cameras found');
+        alert('No se encontraron cámaras en el dispositivo');
+      }
+    } catch (err) {
+      console.error('Error starting scanner:', err);
+      alert('Error al iniciar el escáner. Por favor, asegúrate de que la cámara esté disponible y hayas dado los permisos necesarios.');
     }
-    
-    scannerRef.current.start(
-      { facingMode: "environment" },
-      {
-        fps: 10,
-        qrbox: { width: 250, height: 250 }
-      },
-      handleScanSuccess,
-      handleScanFailure
-    );
   };
 
-  const stopScanning = () => {
+  const stopScanning = async () => {
     if (scannerRef.current && scannerRef.current.isScanning) {
-      scannerRef.current.stop().then(() => {
-        setIsScanning(false);
-      });
+      await scannerRef.current.stop();
+      setIsScanning(false);
     }
   };
 
@@ -53,7 +64,7 @@ const Presentismo: React.FC = () => {
     <div className="flex flex-col items-center justify-center bg-gray-100 p-4 rounded">
       {isScanning ? (
         <>
-          <div id="reader" style={{ width: "300px" }} />
+          <div id="reader" style={{ width: "300px", height: "300px" }} />
           <button onClick={stopScanning} className="mt-4 bg-red-500 text-white p-2 rounded">
             Cancelar
           </button>
