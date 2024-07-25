@@ -5,9 +5,7 @@
 
 body {
   margin: 0;
-  padding-top: 64px; /* Altura del Header */
-  padding-bottom: 64px; /* Altura del BottomNav */
- 
+
 }
 
 html, body, #root {

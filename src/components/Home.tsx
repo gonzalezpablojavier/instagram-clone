@@ -123,7 +123,7 @@ const Home: React.FC = () => {
           <div className="bg-cyan-600 text-white p-4 rounded shadow flex flex-col items-center justify-center">
           <h1 className="text-2xl font-semibold mb-4 font-montserrat">Colecta Día de la Niñez</h1> 
           <div className="flex space-x-8">      
-            <h2 className="text-4xl font-semibold mb-4 font-lato">Un juguete x una sonrisa</h2>
+            <h2 className="text-4xl font-semibold mb-4 text-center items-center justify-center font-lato text-blue-900">Un juguete x una sonrisa</h2>
             </div>   
           </div>
 
