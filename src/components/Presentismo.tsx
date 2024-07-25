@@ -60,9 +60,10 @@ const Presentismo: React.FC = () => {
         <button
           onClick={handleStartScanning}
           className="w-32 h-32 rounded-full"
-          style={{ backgroundImage: "url('/images/qr-code.png')" }}
+    
         >
-          {/* Button content (e.g., an icon or text) */}
+            <img src="/images/qr-code.png" alt="Perfil" className="w-24 h-24 object-cover rounded-full"/>
+    
         </button>
       )}
       {scanResult && (
