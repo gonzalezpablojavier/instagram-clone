@@ -1,9 +1,10 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Html5Qrcode } from 'html5-qrcode';
+import { Html5Qrcode, CameraDevice } from 'html5-qrcode';
 
 const Presentismo: React.FC = () => {
   const [scanResult, setScanResult] = useState<string | null>(null);
   const [isScanning, setIsScanning] = useState<boolean>(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const scannerRef = useRef<Html5Qrcode | null>(null);
 
   const handleScanSuccess = (decodedText: string) => {
@@ -17,14 +18,27 @@ const Presentismo: React.FC = () => {
   };
 
   const startScanning = async () => {
+    setErrorMessage(null);
     try {
       if (!scannerRef.current) {
         scannerRef.current = new Html5Qrcode("reader");
       }
 
       const devices = await Html5Qrcode.getCameras();
+      console.log("Available cameras:", devices);
+
       if (devices && devices.length) {
-        const cameraId = devices[devices.length - 1].id; // Typically, the last camera is the back camera
+        let cameraId: string;
+        if (devices.length > 1) {
+          // Attempt to find a back camera
+          const backCamera = devices.find(device => device.label.toLowerCase().includes('back'));
+          cameraId = backCamera ? backCamera.id : devices[devices.length - 1].id;
+        } else {
+          cameraId = devices[0].id;
+        }
+
+        console.log("Selected camera:", cameraId);
+
         await scannerRef.current.start(
           cameraId,
           {
@@ -36,12 +50,11 @@ const Presentismo: React.FC = () => {
         );
         setIsScanning(true);
       } else {
-        console.error('No cameras found');
-        alert('No se encontraron cámaras en el dispositivo');
+        throw new Error('No cameras found');
       }
-    } catch (err) {
+    } catch (err: any) {
       console.error('Error starting scanner:', err);
-      alert('Error al iniciar el escáner. Por favor, asegúrate de que la cámara esté disponible y hayas dado los permisos necesarios.');
+      setErrorMessage(`Error: ${err.message || 'Unknown error occurred'}`);
     }
   };
 
@@ -76,6 +89,11 @@ const Presentismo: React.FC = () => {
         >
           <img src="/images/qr-code.png" alt="Perfil" className="w-24 h-24 object-cover rounded-full"/>
         </button>
+      )}
+      {errorMessage && (
+        <div className="mt-4 p-4 bg-red-100 text-red-700 rounded">
+          {errorMessage}
+        </div>
       )}
       {scanResult && (
         <div className="mt-4 p-4 bg-white shadow rounded">
