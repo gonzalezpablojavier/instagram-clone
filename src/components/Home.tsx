@@ -9,8 +9,20 @@ const Home: React.FC = () => {
   const [profile, setProfile] = useState<any>(null);
   const [lastMood, setLastMood] = useState<any>(null);
   const [colaboradorID, setColaboradorID] = useState<string | null>(null);
-  const [presentTime, setPresentTime] = useState<string | null>(null);
+  const [presentTime, setPresentTime] = useState<any>(null);
   const API_URL = process.env.REACT_APP_API_URL;
+
+
+  const formatDateTime = (dateTimeString: string) => {
+    const date = new Date(dateTimeString);
+    const day = date.getDate().toString().padStart(2, '0');
+    const month = (date.getMonth() + 1).toString().padStart(2, '0');
+    const year = date.getFullYear();
+    const hours = date.getHours().toString().padStart(2, '0');
+    const minutes = date.getMinutes().toString().padStart(2, '0');
+    
+    return `${day}/${month}/${year} ${hours}:${minutes}`;
+  };
   
   useEffect(() => {
     const colaboradorID = localStorage.getItem('colaboradorID');
@@ -54,28 +66,26 @@ const Home: React.FC = () => {
 
     // Fetch present time
     const fetchPresentTime = async () => {
-      if (user && user.username) {
+     
         const response = await axios.get(`${API_URL}/presentismo/${colaboradorID}/last`);
-        if (response.data && response.data.time) {
-          setPresentTime(response.data.time);
+        if (response.data.ok===1) {
+          setPresentTime(response.data.data);
         }
-      }
+     
     };
 
     fetchProfile();
     fetchLastMood();
-  //  fetchPresentTime();
+    fetchPresentTime();
   }, [colaboradorID]);
 
   const renderMoodIcon = (mood: string) => {
-    if (mood === 'super') {
+    if (mood === 'muy bien') {
       return <button className="text-4xl">😎</button>;
-    } else if (mood === 'contento') {
+    } else if (mood === 'bien') {
       return <button className="text-4xl">😊</button>;
-    } else if (mood === 'triste') {
+    } else if (mood === 'normal') {
       return <button className="text-4xl">😢</button>;
-    } else if (mood === 'enojado') {
-      return <button className="text-4xl">😠</button>;
     } else if (mood === 'mal') {
       return <button className="text-4xl">🤐</button>;
     } else {
@@ -91,7 +101,19 @@ const Home: React.FC = () => {
        
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           <div className="bg-cyan-600 text-white p-4 rounded shadow flex items-center justify-center">
-            {profile ? <img src="/images/winner.png" alt="Perfil" className="w-24 h-24 object-cover rounded-full"/>  : 'Foto de perfil'}       
+          {profile && profile.foto ? (
+              <img 
+                src={profile.foto} 
+                alt="Foto de perfil" 
+                className="w-24 h-24 object-cover rounded-full"
+              />
+            ) : (
+              <img 
+                src="/images/winner.png" 
+                alt="Foto por defecto" 
+                className="w-24 h-24 object-cover rounded-full"
+              />
+            )}      
              
           </div>
           <div className="bg-cyan-600 text-white p-4 rounded shadow flex flex-col items-center justify-center">
@@ -112,8 +134,10 @@ const Home: React.FC = () => {
           <div className="bg-amber-400 text-white p-4 rounded shadow flex flex-col items-center justify-center">
           <h2 className="text-2xl font-semibold mb-4 font-montserrat">¿Llegaste a la ofi?</h2> 
           <div className="flex space-x-8">
-            {presentTime && <p className="text-lg">{presentTime}</p>}
-            <h2 className="text-4xl font-semibold mb-4 font-montserrat">08:02</h2>
+            <span className="text-1xl font-semibold mb-4 text-center items-center justify-center font-montserrat">{presentTime ? ` ${presentTime.tipo}` : ''}</span>
+           </div>
+            <div className="flex space-x-8">         
+            <h2 className="text-2xl font-semibold mb-4 text-center items-center justify-center font-montserrat">{presentTime ? ` ${formatDateTime(presentTime.horaRegistro)}` : ''}</h2>
             </div>   
           </div>
 

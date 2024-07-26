@@ -34,11 +34,11 @@ const HowAreYou: React.FC = () => {
       <h2 className="text-2xl mb-4 font-semibold font-montserrat">¿Cómo te sentis hoy?</h2>
       <div className="grid grid-cols-2 gap-4 mb-4">
         <div className="flex flex-col items-center">
-          <button onClick={() => handleMoodClick('super')} className="text-4xl">😎</button>
+          <button onClick={() => handleMoodClick('muy bien')} className="text-4xl">😎</button>
           <span className="text-xs">MUY BIEN</span>
         </div>
         <div className="flex flex-col items-center">
-          <button onClick={() => handleMoodClick('contento')} className="text-4xl">😊</button>
+          <button onClick={() => handleMoodClick('bien')} className="text-4xl">😊</button>
           <span className="text-xs">BIEN</span>
         </div>
         <div className="flex flex-col items-center">

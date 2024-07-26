@@ -92,7 +92,7 @@ const Presentismo: React.FC = () => {
 
   return (
     <div className="flex flex-col items-center justify-center bg-gray-100 p-4 rounded">
-  <div className="mb-4">
+  <div className="mb-4" >
         <label className={`cursor-pointer inline-block px-4 py-2 rounded-full border-2 border-blue-950 text-white-950 font-bold transition-all duration-300 mr-2 ${
             tipo === 'entrada' ? 'bg-blue-950 text-white' : 'bg-white'
           }`}>
@@ -117,9 +117,9 @@ const Presentismo: React.FC = () => {
           />
           Salida
         </label>
-      </div>
-
-      {isScanning ? (
+  
+<div className=" flex flex-col items-center items-center justify-center text-white rounded">     
+  {isScanning ? (
         <>
           <div id="reader" ref={divRef} style={{ width: "300px" }} />
           <button onClick={handleStopScanning} className="mt-4 bg-red-500 text-white p-2 rounded">
@@ -129,14 +129,16 @@ const Presentismo: React.FC = () => {
       ) : (
         <button
           onClick={handleStartScanning}
-          className="w-32 h-32 rounded-full">
-            <img src="/images/qr-code.png" alt="Perfil" className="w-24 h-24 object-cover rounded-full"/>    
+          className="w-32 h-32 rounded-full justify-center">
+            <img src="/images/qr-code.png" alt="Perfil" className="w-24 h-24 object-cover rounded-full "/>    
         </button>
       )}
+      </div>
+ 
+          </div>
       {scanResult && (
         <div className="mt-4 p-4 bg-white shadow rounded">
-          <p className="text-lg">Resultado del escaneo:</p>
-          <p className="text-md">{scanResult}</p>
+ 
         </div>
       )}
     </div>
