@@ -1,41 +1,54 @@
-// src/components/BottomNav.tsx
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { Route } from '../config/permissions';
+
 const BottomNav: React.FC = () => {
   const navigate = useNavigate();
-  const { isAuthenticated } = useAuth();
+  const location = useLocation();
+  const { isAuthenticated, hasPermission } = useAuth();
+
+  const navItems = [
+    { path: Route.PermisoTemporal, icon: '/images/airport.svg', alt: 'Permiso temporal' },
+    { path: Route.Home, icon: '/images/home.svg', alt: 'Home' },
+    { path: Route.HowAreYou, icon: '/images/star.svg', alt: 'How are you' },
+    { path: Route.PanelPermisosTemporales, icon: '/images/key.png', alt: 'Panel Permisos' },
+    { path: Route.ManageMoods, icon: '/images/user.png', alt: 'Manage Moods' },
+  ];
+
+  const isActive = (path: Route) => location.pathname === path;
 
   return (
-
-       <nav className="bg-blue-950 fixed bottom-0 left-0 right-0 shadow-md flex justify-around p-4 z-10 animate__animated animate__fadeInUp">
-   
-      {/*<button onClick={() => navigate('/reconocemos')}>🌟</button>*/}
-   
-
-   
-  
-      <div className="flex flex-col items-center" onClick={() => navigate('/permiso-temporal')}>
-
-      <img src="/images/airport.svg" width={38}></img>
-      </div>
-
-      <div className="flex flex-col items-center" onClick={() => navigate('/home')}>
-      <button className='text-2xl'>
-          <img src="/images/home.svg" width="48x"></img>
-      </button>
- 
-      </div>
-
-      <div className="flex flex-col items-center" onClick={() => navigate('/how-are-you')}>
-        <button className='text-2xl'> 
-        <img src="/images/star.svg" width={38}></img>   
-        </button>   
-      </div>
-      {!isAuthenticated && <button onClick={() => navigate('/login')}>👤</button>}
-     
-
-
+    <nav className="bg-blue-950 shadow-md flex lg:flex-col justify-around p-4 z-10 fixed bottom-0 left-0 right-0 lg:top-0 lg:bottom-0 lg:w-20 lg:h-screen">
+      {navItems.map((item) => (
+        hasPermission(item.path) && (
+          <div 
+            key={item.path}
+            className={`flex flex-col items-center cursor-pointer transition-all duration-300 ${
+              isActive(item.path) ? 'scale-110 bg-blue-800 rounded-full p-2' : 'hover:bg-blue-900 rounded-full p-2'
+            }`}
+            onClick={() => navigate(item.path)}
+          >
+            <img src={item.icon} width={38} alt={item.alt} />
+            {isActive(item.path) && (
+              <div className="w-2 h-2 bg-white rounded-full mt-1" />
+            )}
+          </div>
+        )
+      ))}
+      {!isAuthenticated && (
+        <div 
+          className={`flex flex-col items-center cursor-pointer ${
+            isActive(Route.Login) ? 'scale-110 bg-blue-800 rounded-full p-2' : 'hover:bg-blue-900 rounded-full p-2'
+          }`}
+          onClick={() => navigate(Route.Login)}
+        >
+          <button className='text-2xl'>👤</button>
+          {isActive(Route.Login) && (
+            <div className="w-2 h-2 bg-white rounded-full mt-1" />
+          )}
+        </div>
+      )}
     </nav>
   );
 };

@@ -5,11 +5,12 @@ import { useAuth } from '../context/AuthContext';
 import { Link } from 'react-router-dom';
 
 const Home: React.FC = () => {
-  const { user } = useAuth();
+ 
   const [profile, setProfile] = useState<any>(null);
   const [lastMood, setLastMood] = useState<any>(null);
   const [colaboradorID, setColaboradorID] = useState<string | null>(null);
   const [presentTime, setPresentTime] = useState<any>(null);
+  const [solicitud, setSolicitud] = useState<any>(null);
   const API_URL = process.env.REACT_APP_API_URL;
 
 
@@ -74,6 +75,16 @@ const Home: React.FC = () => {
      
     };
 
+      // Fetch present time
+      const fetchSolicitud = async () => {
+     
+        const response = await axios.get(`${API_URL}/permiso-temporal/latest/${colaboradorID}`);
+        
+          setSolicitud(response.data);
+        
+     
+    };
+    fetchSolicitud();
     fetchProfile();
     fetchLastMood();
     fetchPresentTime();
@@ -92,14 +103,25 @@ const Home: React.FC = () => {
       return <p className="text-4xl">{mood}</p>;
     }
   };
-
+  const getBgColor = (estado: string | undefined) => {
+    switch (estado) {
+      case 'Aprobado':
+        return 'bg-green-500';
+      case 'Rechazado':
+        return 'bg-red-500';
+      case 'Evaluando':
+        return 'bg-yellow-500';
+      default:
+        return 'bg-gray-400';
+    }
+  };
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-gray-100 p-4">
    
       <main className="flex-grow mt-16 w-full max-w-5xl mx-auto">
        
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-4">
           <div className="bg-cyan-600 text-white p-4 rounded shadow flex items-center justify-center">
           {profile && profile.foto ? (
               <img 
@@ -140,7 +162,16 @@ const Home: React.FC = () => {
             <h2 className="text-2xl font-semibold mb-4 text-center items-center justify-center font-montserrat">{presentTime ? ` ${formatDateTime(presentTime.horaRegistro)}` : ''}</h2>
             </div>   
           </div>
-
+   
+          <div className={`${getBgColor(solicitud?.autorizado)} text-white p-4 rounded shadow flex flex-col items-center justify-center`}>
+          <h2 className="text-2xl font-semibold mb-4 font-montserrat">Mi solicitud</h2> 
+          <div className="flex space-x-4">
+          <img src="/images/airport.svg" width={38}></img>
+            </div> 
+            <div className="flex space-x-8">         
+            <h2 className="text-2xl font-semibold mb-4 text-center items-center justify-center font-montserrat">{solicitud ? ` ${solicitud.autorizado}` : ''}</h2>
+            </div>   
+          </div>
 
           <div className="bg-cyan-600 text-white p-4 rounded shadow flex flex-col items-center justify-center">
           <h1 className="text-2xl font-semibold mb-4 font-montserrat">Colecta Día de la Niñez</h1> 

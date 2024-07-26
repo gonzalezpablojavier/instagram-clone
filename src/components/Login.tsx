@@ -1,35 +1,45 @@
 import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
-
+import { useNavigate } from 'react-router-dom';
+import { Route } from '../config/permissions';
+import axios from 'axios';
 const Login: React.FC = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
-  const [successMessage, setSuccessMessage] = useState('');
   const { login } = useAuth();
+  const navigate = useNavigate();
+  const API_URL = process.env.REACT_APP_API_URL;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const success = await login(username, password);
-    if (success) {
-      setSuccessMessage('Login exitoso!');
-      setError('');
-    } else {
+    setError('');
+
+    try {
+
+      const response = await axios.post(`${API_URL}/auth/login`, { username, password });
+      const { colaboradorID, access_token } = response.data;
+
+      // Almacena el token JWT si lo necesitas para futuras solicitudes
+      localStorage.setItem('access_token', access_token);
+
+      // Llama a la función login del contexto de autenticación
+      login(colaboradorID);
+
+      // Redirige al usuario a la página principal
+      navigate(Route.Home);
+    } catch (err) {
       setError('Credenciales inválidas');
-      setSuccessMessage('');
     }
   };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-cyan-600 bg-cover bg-center">
-     
-          <form 
-        onSubmit={handleSubmit} 
-        className="bg-cyan-600 p-8 rounded-lg  w-80 space-y-4 animate__animated animate__backInRight"
+      <form
+        onSubmit={handleSubmit}
+        className="bg-cyan-600 p-8 rounded-lg w-80 space-y-4 animate__animated animate__backInRight"
       >
-      
         {error && <p className="text-red-500">{error}</p>}
-        {successMessage && <p className="text-green-500">{successMessage}</p>}
         <img src="/images/logo-head.png" alt="Logo" className="mx-auto mb-8" />
         <input
           type="text"
@@ -54,7 +64,6 @@ const Login: React.FC = () => {
         </button>
       </form>
     </div>
-   
   );
 };
 

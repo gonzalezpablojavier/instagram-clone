@@ -1,83 +1,54 @@
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { useNavigate } from 'react-router-dom';
-import apiClient from '../api/apiClient'; // Importa el cliente Axios configurado
+import React, { createContext, useContext, useState, useEffect } from 'react';
+import { hasPermission, Route } from '../config/permissions';
+
 interface AuthContextType {
   isAuthenticated: boolean;
-  user: { username: string } | null;
-  setUser: (user: { username: string } | null) => void;
-  login: (username: string, password: string) => Promise<boolean>;
+  colaboradorID: string | null;
+  login: (colaboradorID: string) => void;
   logout: () => void;
+  hasPermission: (route: Route) => boolean;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(() => {
-    const savedAuth = localStorage.getItem('isAuthenticated');
-    return savedAuth ? JSON.parse(savedAuth) : false;
-  });
-
-  const [user, setUser] = useState<{ username: string } | null>(() => {
-    const savedUser = localStorage.getItem('nombreUsuario');
-    return savedUser ? { username: savedUser } : null;
-  });
-
-  const navigate = useNavigate();
+export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [colaboradorID, setColaboradorID] = useState<string | null>(null);
 
   useEffect(() => {
-    localStorage.setItem('isAuthenticated', JSON.stringify(isAuthenticated));
-  }, [isAuthenticated]);
-
-  useEffect(() => {
-    if (user) {
-      localStorage.setItem('nombreUsuario', user.username);
-    } else {
-      localStorage.removeItem('nombreUsuario');
+    const storedColaboradorID = localStorage.getItem('colaboradorID');
+    if (storedColaboradorID) {
+      setIsAuthenticated(true);
+      setColaboradorID(storedColaboradorID);
     }
-  }, [user]);
-//elated-kowalevski.51-222-158-198.plesk.page
-  const login = async (username: string, password: string): Promise<boolean> => {
+  }, []);
 
-
-    try {
-
-
-      const response = await apiClient.post('/auth/login', { username, password });
-      if (response.status === 201) {
-        const { colaboradorID, nombreUsuario } = response.data;
-        setUser({ username: nombreUsuario });
-        localStorage.setItem('colaboradorID', colaboradorID);
-        localStorage.setItem('nombreUsuario', nombreUsuario);
-        setIsAuthenticated(true);
-        navigate('/');
-        return true;
-      } else {
-        return false;
-      }
-    } catch (error) {
-      console.error(error);
-      return false;
-    }
+  const login = (id: string) => {
+    setIsAuthenticated(true);
+    setColaboradorID(id);
+    localStorage.setItem('colaboradorID', id);
   };
 
   const logout = () => {
     setIsAuthenticated(false);
-    setUser(null);
+    setColaboradorID(null);
     localStorage.removeItem('colaboradorID');
-    localStorage.removeItem('nombreUsuario');
-    navigate('/login');
+  };
+
+  const checkPermission = (route: Route) => {
+    return colaboradorID ? hasPermission(colaboradorID, route) : false;
   };
 
   return (
-    <AuthContext.Provider value={{ isAuthenticated, user, setUser, login, logout }}>
+    <AuthContext.Provider value={{ isAuthenticated, colaboradorID, login, logout, hasPermission: checkPermission }}>
       {children}
     </AuthContext.Provider>
   );
 };
 
-export const useAuth = (): AuthContextType => {
+export const useAuth = () => {
   const context = useContext(AuthContext);
-  if (!context) {
+  if (context === undefined) {
     throw new Error('useAuth must be used within an AuthProvider');
   }
   return context;
