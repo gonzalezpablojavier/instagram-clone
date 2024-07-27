@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
-
+import axios, { AxiosError } from 'axios';
 const initialState = {
   fechaPermiso: '',
   colaboradorCubre: '',
@@ -47,18 +46,48 @@ const PermisoTemporal: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError(null); // Limpiar errores previos
+    setSolicitudEnviada(false); // Reiniciar el estado de envío
+  
     try {
-      const response = await axios.post(`${API_URL}/permiso-temporal`, formData);
+      const response = await axios.post(`${API_URL}/permiso-temporal`, formData, {
+        timeout: 10000, // Establecer un tiempo límite de 10 segundos
+        headers: {
+          'Content-Type': 'application/json',
+          // Agregar aquí cualquier encabezado de autenticación necesario
+        },
+      });
+  
       if (response.status === 201) {
         setSolicitudEnviada(true);
+        setUltimoPermiso(response.data); // Asumiendo que el backend devuelve el permiso creado
+        console.log('Solicitud enviada exitosamente:', response.data);
       } else {
-        setError('Error al enviar la solicitud');
+        throw new Error(`Estado de respuesta inesperado: ${response.status}`);
       }
     } catch (error) {
-      setError('Error al enviar la solicitud');
-      console.error(error);
+      console.error('Detalles del error:', error);
+  
+      if (axios.isAxiosError(error)) {
+        const axiosError = error as AxiosError;
+        if (axiosError.response) {
+          // La solicitud se realizó y el servidor respondió con un código de estado
+          // que cae fuera del rango de 2xx
+          setError(`Error del servidor: ${axiosError.response.status} - ${axiosError.response.data}`);
+        } else if (axiosError.request) {
+          // La solicitud se realizó pero no se recibió respuesta
+          setError('No se recibió respuesta del servidor. Por favor, intente nuevamente.');
+        } else {
+          // Algo ocurrió al configurar la solicitud que desencadenó un Error
+          setError(`Error al configurar la solicitud: ${axiosError.message}`);
+        }
+      } else {
+        setError('Error desconocido al enviar la solicitud');
+      }
     }
-  };
+     // Verificar la presentación independientemente del resultado
+  await verificarUltimoPermiso(formData.colaboradorID);
+};
 
   const handleDelete = async () => {
     setIsDeleting(true);

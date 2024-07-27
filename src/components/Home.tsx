@@ -164,13 +164,15 @@ const Home: React.FC = () => {
           </div>
    
           <div className={`${getBgColor(solicitud?.autorizado)} text-white p-4 rounded shadow flex flex-col items-center justify-center`}>
-          <h2 className="text-2xl font-semibold mb-4 font-montserrat">Mi solicitud</h2> 
+       
           <div className="flex space-x-4">
           <img src="/images/airport.svg" width={38}></img>
             </div> 
             <div className="flex space-x-8">         
-            <h2 className="text-2xl font-semibold mb-4 text-center items-center justify-center font-montserrat">{solicitud ? ` ${solicitud.autorizado}` : ''}</h2>
+                <h2 className="text-2xl font-semibold mb-4 text-center items-center justify-center font-montserrat">{solicitud ? ` ${solicitud.autorizado}` : ''}</h2>
             </div>   
+            <div className="flex space-x-8">         
+              </div>  
           </div>
 
           <div className="bg-cyan-600 text-white p-4 rounded shadow flex flex-col items-center justify-center">
