@@ -1,11 +1,16 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Html5Qrcode } from 'html5-qrcode';
 
+interface Camera {
+  id: string;
+  label: string;
+}
+
 const Presentismo: React.FC = () => {
   const [scanResult, setScanResult] = useState<string | null>(null);
   const [isScanning, setIsScanning] = useState<boolean>(false);
   const [cameraId, setCameraId] = useState<string>('');
-  const [cameras, setCameras] = useState<Array<{ id: string; label: string }>>([]);
+  const [cameras, setCameras] = useState<Camera[]>([]);
   const scannerRef = useRef<Html5Qrcode | null>(null);
   const readerRef = useRef<HTMLDivElement>(null);
   const [colaboradorID, setColaboradorID] = useState<string | null>(null);
@@ -19,10 +24,22 @@ const Presentismo: React.FC = () => {
     }
 
     Html5Qrcode.getCameras().then((devices) => {
-      setCameras(devices);
-      if (devices.length > 0) {
-        const rearCamera = devices.find(camera => /(back|rear)/i.test(camera.label));
-        setCameraId(rearCamera ? rearCamera.id : devices[0].id);
+      // Filtrar solo las cámaras traseras
+      const backCameras = devices.filter(camera => /(back|rear)/i.test(camera.label));
+      
+      // Si no hay cámaras traseras, usar todas las cámaras
+      const availableCameras = backCameras.length > 0 ? backCameras : devices;
+      
+      // Simplificar los nombres de las cámaras
+      const simplifiedCameras = availableCameras.map((camera, index) => ({
+        id: camera.id,
+        label: `Cámara ${index + 1}`
+      }));
+
+      setCameras(simplifiedCameras);
+      
+      if (simplifiedCameras.length > 0) {
+        setCameraId(simplifiedCameras[0].id);
       }
     }).catch(err => {
       console.error('Error getting cameras', err);
@@ -80,7 +97,6 @@ const Presentismo: React.FC = () => {
 
     setIsScanning(true);
 
-    // Asegurarse de que el elemento existe antes de intentar iniciar el escáner
     if (readerRef.current) {
       const config = { fps: 10, qrbox: { width: 250, height: 250 } };
       scannerRef.current = new Html5Qrcode(readerRef.current.id);
@@ -138,13 +154,12 @@ const Presentismo: React.FC = () => {
       </div>
 
       <div className="flex flex-col items-center justify-center text-white rounded">
-        {!isScanning && (
+        {!isScanning && cameras.length > 1 && (
           <select
             value={cameraId}
             onChange={(e) => setCameraId(e.target.value)}
             className="mb-4 p-2 border rounded text-black"
           >
-            <option value="">Seleccione una cámara</option>
             {cameras.map((camera) => (
               <option key={camera.id} value={camera.id}>
                 {camera.label}
