@@ -1,11 +1,13 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Html5QrcodeScanner } from 'html5-qrcode';
+import { Html5Qrcode } from 'html5-qrcode';
 
 const Presentismo: React.FC = () => {
   const [scanResult, setScanResult] = useState<string | null>(null);
   const [isScanning, setIsScanning] = useState<boolean>(false);
-  const scannerRef = useRef<Html5QrcodeScanner | null>(null);
-  const divRef = useRef<HTMLDivElement | null>(null);
+  const [cameraId, setCameraId] = useState<string>('');
+  const [cameras, setCameras] = useState<Array<{ id: string; label: string }>>([]);
+  const scannerRef = useRef<Html5Qrcode | null>(null);
+  const readerRef = useRef<HTMLDivElement>(null);
   const [colaboradorID, setColaboradorID] = useState<string | null>(null);
   const API_URL = process.env.REACT_APP_API_URL;
   const [tipo, setTipo] = useState<'entrada' | 'salida'>('entrada');
@@ -15,23 +17,33 @@ const Presentismo: React.FC = () => {
     if (storedColaboradorID) {
       setColaboradorID(storedColaboradorID);
     }
+
+    Html5Qrcode.getCameras().then((devices) => {
+      setCameras(devices);
+      if (devices.length > 0) {
+        const rearCamera = devices.find(camera => /(back|rear)/i.test(camera.label));
+        setCameraId(rearCamera ? rearCamera.id : devices[0].id);
+      }
+    }).catch(err => {
+      console.error('Error getting cameras', err);
+    });
+
+    return () => {
+      if (scannerRef.current) {
+        scannerRef.current.clear();
+      }
+    };
   }, []);
 
   const handleScanSuccess = (decodedText: string) => {
     setScanResult(decodedText);
     alert('Presente marcado correctamente');
-    setIsScanning(false);
-    if (scannerRef.current) {
-      scannerRef.current.clear();
-      scannerRef.current = null;
-    } 
+    handleStopScanning();
     enviarDatosAlBackend(decodedText);
   };
 
   const enviarDatosAlBackend = async (decodedText: string) => {
-    // Aquí puedes extraer o manipular los datos de decodedText si es necesario
-    const colaboradorID =localStorage.getItem('colaboradorID') ; // Puedes ajustar esto según tus necesidades
-  
+    const colaboradorID = localStorage.getItem('colaboradorID');
     const horaRegistro = new Date().toISOString();
 
     const datos = {
@@ -60,42 +72,48 @@ const Presentismo: React.FC = () => {
     }
   };
 
-  const handleScanFailure = (error: any) => {
-    console.warn(`Error scanning QR code: ${error}`);
-  };
-
   const handleStartScanning = () => {
+    if (!cameraId) {
+      alert("Por favor, seleccione una cámara antes de escanear.");
+      return;
+    }
+
     setIsScanning(true);
+
+    // Asegurarse de que el elemento existe antes de intentar iniciar el escáner
+    if (readerRef.current) {
+      const config = { fps: 10, qrbox: { width: 250, height: 250 } };
+      scannerRef.current = new Html5Qrcode(readerRef.current.id);
+      scannerRef.current.start(cameraId, config, handleScanSuccess, (error) => {
+        console.warn(`Error scanning QR code: ${error}`);
+      }).catch((err) => {
+        console.error("Error starting scanner:", err);
+        alert("Error al iniciar la cámara. Por favor, asegúrese de conceder los permisos necesarios.");
+        setIsScanning(false);
+      });
+    } else {
+      console.error("QR reader element not found");
+      setIsScanning(false);
+    }
   };
 
   const handleStopScanning = () => {
     setIsScanning(false);
     if (scannerRef.current) {
-      scannerRef.current.clear();
-      scannerRef.current = null;
+      scannerRef.current.stop().then(() => {
+        scannerRef.current = null;
+      }).catch(err => {
+        console.error("Error stopping scanner:", err);
+      });
     }
   };
 
-  useEffect(() => {
-    if (isScanning && divRef.current) {
-      const config = { fps: 10, qrbox: { width: 250, height: 250 }, facingMode: "environment" };
-      scannerRef.current = new Html5QrcodeScanner("reader", config, false);
-      scannerRef.current.render(handleScanSuccess, handleScanFailure);
-    }
-    return () => {
-      if (scannerRef.current) {
-        scannerRef.current.clear();
-        scannerRef.current = null;
-      }
-    };
-  }, [isScanning]);
-
   return (
     <div className="flex flex-col items-center justify-center bg-gray-100 p-4 rounded">
-  <div className="mb-4" >
+      <div className="mb-4">
         <label className={`cursor-pointer inline-block px-4 py-2 rounded-full border-2 border-blue-950 text-white-950 font-bold transition-all duration-300 mr-2 ${
-            tipo === 'entrada' ? 'bg-blue-950 text-white' : 'bg-white'
-          }`}>
+          tipo === 'entrada' ? 'bg-blue-950 text-white' : 'bg-white'
+        }`}>
           <input
             type="radio"
             value="entrada"
@@ -105,9 +123,9 @@ const Presentismo: React.FC = () => {
           />
           Entrada
         </label>
-        <label  className={`cursor-pointer inline-block px-4 py-2 rounded-full border-2 border-blue-950 text-white-950 font-bold transition-all duration-300 ${
-            tipo === 'salida' ? 'bg-blue-950 text-white' : 'bg-white'
-          }`}>
+        <label className={`cursor-pointer inline-block px-4 py-2 rounded-full border-2 border-blue-950 text-white-950 font-bold transition-all duration-300 ${
+          tipo === 'salida' ? 'bg-blue-950 text-white' : 'bg-white'
+        }`}>
           <input
             type="radio"
             value="salida"
@@ -117,28 +135,44 @@ const Presentismo: React.FC = () => {
           />
           Salida
         </label>
-  
-<div className=" flex flex-col items-center items-center justify-center text-white rounded">     
-  {isScanning ? (
-        <>
-          <div id="reader" ref={divRef} style={{ width: "300px" }} />
+      </div>
+
+      <div className="flex flex-col items-center justify-center text-white rounded">
+        {!isScanning && (
+          <select
+            value={cameraId}
+            onChange={(e) => setCameraId(e.target.value)}
+            className="mb-4 p-2 border rounded text-black"
+          >
+            <option value="">Seleccione una cámara</option>
+            {cameras.map((camera) => (
+              <option key={camera.id} value={camera.id}>
+                {camera.label}
+              </option>
+            ))}
+          </select>
+        )}
+
+        <div id="qr-reader" ref={readerRef} style={{ width: "300px", display: isScanning ? 'block' : 'none' }} />
+
+        {isScanning ? (
           <button onClick={handleStopScanning} className="mt-4 bg-red-500 text-white p-2 rounded">
             Cancelar
           </button>
-        </>
-      ) : (
-        <button
-          onClick={handleStartScanning}
-          className="w-32 h-32 rounded-full justify-center">
-            <img src="/images/qr-code.png" alt="Perfil" className="w-24 h-24 object-cover rounded-full "/>    
-        </button>
-      )}
+        ) : (
+          <button
+            onClick={handleStartScanning}
+            className="w-32 h-32 rounded-full justify-center"
+            disabled={!cameraId}
+          >
+            <img src="/images/qr-code.png" alt="Escanear QR" className="w-24 h-24 object-cover rounded-full" />
+          </button>
+        )}
       </div>
- 
-          </div>
+
       {scanResult && (
         <div className="mt-4 p-4 bg-white shadow rounded">
- 
+          <p>Escaneo exitoso. Datos enviados al servidor.</p>
         </div>
       )}
     </div>
