@@ -46,7 +46,10 @@ const AdminPermisosTemporal: React.FC = () => {
   const fetchPermisos = async () => {
     try {
       const response = await axios.get(`${API_URL}/permiso-temporal`);
-      setPermisos(response.data);
+
+      const sortedMoods = response.data.sort((a: Permiso, b: Permiso) => b.id - a.id);
+   
+      setPermisos(sortedMoods);
     } catch (error) {
       setError('Error al obtener los permisos');
       console.error(error);

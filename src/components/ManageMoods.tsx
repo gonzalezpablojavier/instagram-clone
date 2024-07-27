@@ -39,7 +39,11 @@ const ManageMoods: React.FC = () => {
   const fetchMoods = async () => {
     try {
       const response = await axios.get(`${API_URL}/howareyou`);
-      setMoods(response.data);
+      const sortedMoods = response.data.sort((a: Mood, b: Mood) => 
+        new Date(b.date).getTime() - new Date(a.date).getTime()
+      );
+      setMoods(sortedMoods);
+    
     } catch (error) {
       setError('Error al obtener los estados de ánimo');
       console.error(error);
