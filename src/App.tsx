@@ -14,9 +14,15 @@ import Home from './components/Home';
 import Unauthorized from './components/Unauthorized';
 import { Route } from './config/permissions';
 
+
 const ProtectedRouteWithPermission: React.FC<{ path: Route; element: React.ReactElement }> = ({ path, element }) => {
   const { isAuthenticated, hasPermission } = useAuth();
  
+  if (isAuthenticated === null) {
+    // Estado de autenticación aún no determinado, puedes mostrar un loader aquí
+    return <div>Cargando...</div>;
+  }
+
   if (!isAuthenticated) {
     return <Navigate to={Route.Login} />;
   }

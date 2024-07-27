@@ -10,7 +10,7 @@ export enum Route {
   Unauthorized = '/unauthorized'
 }
 
-export const ADMIN_IDS = ['0', '2', '3'];
+export const ADMIN_IDS = ['0', '2', '8'];
 export const MANAGER_IDS = ['4', '7', '8'];
 
 export const ROUTE_PERMISSIONS: { [key in Route]: string[] } = {

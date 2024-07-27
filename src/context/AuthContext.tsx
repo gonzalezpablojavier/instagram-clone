@@ -2,7 +2,7 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 import { hasPermission, Route } from '../config/permissions';
 
 interface AuthContextType {
-  isAuthenticated: boolean;
+  isAuthenticated: boolean| null;
   colaboradorID: string | null;
   login: (colaboradorID: string) => void;
   logout: () => void;
@@ -12,15 +12,23 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
   const [colaboradorID, setColaboradorID] = useState<string | null>(null);
 
   useEffect(() => {
-    const storedColaboradorID = localStorage.getItem('colaboradorID');
-    if (storedColaboradorID) {
-      setIsAuthenticated(true);
-      setColaboradorID(storedColaboradorID);
-    }
+    const checkAuthStatus = () => {
+      const storedColaboradorID = localStorage.getItem('colaboradorID');
+      const storedToken = localStorage.getItem('access_token');
+      if (storedColaboradorID && storedToken) {
+        setIsAuthenticated(true);
+        setColaboradorID(storedColaboradorID);
+      } else {
+        setIsAuthenticated(false);
+        setColaboradorID(null);
+      }
+    };
+
+    checkAuthStatus();
   }, []);
 
   const login = (id: string) => {
@@ -40,7 +48,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   return (
-    <AuthContext.Provider value={{ isAuthenticated, colaboradorID, login, logout, hasPermission: checkPermission }}>
+    <AuthContext.Provider value={{ 
+      isAuthenticated,
+      colaboradorID, 
+      login, 
+      logout, 
+      hasPermission: checkPermission 
+    }}>
       {children}
     </AuthContext.Provider>
   );
