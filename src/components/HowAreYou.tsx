@@ -34,9 +34,9 @@ const HowAreYou: React.FC = () => {
    
       
       <h2 className="text-3xl mt-8 mb-4 font-semibold font-montserrat">¿Ya llegaste a la Distri?</h2>
-      <p  className="text-2xl mb-4 font-semibold font-montserrat">Paso 1: Marca tu entrada o Salida</p>
+      <p  className="text-1xl mb-4 font-semibold font-montserrat">Paso 1: Marca tu entrada o Salida</p>
       <Presentismo />
-      <p  className="text-2xl mb-4 font-semibold font-montserrat">Paso 3: Listo!</p>
+      <p  className="text-1xl mb-4 font-semibold font-montserrat">Paso 3: Listo!</p>
      
     </div>
   );
