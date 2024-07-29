@@ -18,7 +18,7 @@ const PermisoTemporal: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
   const API_URL = process.env.REACT_APP_API_URL;
-  const areas = ['Sistemas', 'Administración', 'Depósito', 'Comercial', 'GO'];
+  const areas = ['Sistemas', 'Administración', 'Depósito', 'Comercial', 'GO','Contabilidad','Compras','TV'];
   useEffect(() => {
     const colaboradorID = localStorage.getItem('colaboradorID');
     if (colaboradorID) {

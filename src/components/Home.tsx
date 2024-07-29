@@ -145,12 +145,6 @@ const Home: React.FC = () => {
           </div>
           </div>
 
-          <div className="bg-cyan-600 text-white p-4 rounded shadow flex flex-col items-center justify-center">
-          <h2 className="text-2xl font-semibold mb-4 font-montserrat">¿Cómo te sentis hoy?</h2>         
-            <div className="flex space-x-4">
-            {lastMood && renderMoodIcon(lastMood.mood)}
-            </div>            
-          </div>
 
           
           <div className="bg-amber-400 text-white p-4 rounded shadow flex flex-col items-center justify-center">

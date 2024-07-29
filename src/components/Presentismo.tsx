@@ -152,7 +152,7 @@ const Presentismo: React.FC = () => {
           Salida
         </label>
       </div>
-
+      <p  className="text-2xl mb-4 font-semibold font-montserrat">Paso 2: acercate a tu QR más cercano y presiona sobre la imágen</p>
       <div className="flex flex-col items-center justify-center text-white rounded">
         {!isScanning && cameras.length > 1 && (
           <select

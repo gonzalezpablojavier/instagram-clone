@@ -31,31 +31,13 @@ const HowAreYou: React.FC = () => {
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-gray-100 p-4">
-      <h2 className="text-2xl mb-4 font-semibold font-montserrat">¿Cómo te sentis hoy?</h2>
-      <div className="grid grid-cols-2 gap-4 mb-4">
-        <div className="flex flex-col items-center">
-          <button onClick={() => handleMoodClick('muy bien')} className="text-4xl">😎</button>
-          <span className="text-xs">MUY BIEN</span>
-        </div>
-        <div className="flex flex-col items-center">
-          <button onClick={() => handleMoodClick('bien')} className="text-4xl">😊</button>
-          <span className="text-xs">BIEN</span>
-        </div>
-        <div className="flex flex-col items-center">
-          <button onClick={() => handleMoodClick('normal')} className="text-4xl">😐</button>
-          <span className="text-xs">NORMAL</span>
-        </div>
-        <div className="flex flex-col items-center">
-          <button onClick={() => handleMoodClick('mal')} className="text-4xl">😢</button>
-          <span className="text-xs">MAL</span>
-        </div>
-      </div>
+   
       
-      {message && <p className="text-green-500 mt-4">{message}</p>}
-      
-      <h2 className="text-2xl mt-8 mb-4 font-semibold font-montserrat">¿Ya llegaste?</h2>
+      <h2 className="text-3xl mt-8 mb-4 font-semibold font-montserrat">¿Ya llegaste a la Distri?</h2>
+      <p  className="text-2xl mb-4 font-semibold font-montserrat">Paso 1: Marca tu entrada o Salida</p>
       <Presentismo />
-      <span className="text-2xl mb-4 font-montserrat">acercate a tu QR más cercano</span>
+      <p  className="text-2xl mb-4 font-semibold font-montserrat">Paso 3: Listo!</p>
+     
     </div>
   );
 };

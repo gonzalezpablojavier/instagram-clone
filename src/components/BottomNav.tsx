@@ -13,7 +13,7 @@ const BottomNav: React.FC = () => {
     { path: Route.Home, icon: '/images/home.svg', alt: 'Home' },
     { path: Route.HowAreYou, icon: '/images/star.svg', alt: 'How are you' },
     { path: Route.PanelPermisosTemporales, icon: '/images/key.png', alt: 'Panel Permisos' },
-    { path: Route.ManageMoods, icon: '/images/user.png', alt: 'Manage Moods' },
+  
   ];
 
   const isActive = (path: Route) => location.pathname === path;
