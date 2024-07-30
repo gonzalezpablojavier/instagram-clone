@@ -1,6 +1,24 @@
-import React, { useState, useEffect,useRef ,ChangeEvent } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
-
+import {
+  TextField,
+  Button,
+  Select,
+  MenuItem,
+  FormControl,
+  InputLabel,
+  Grid,
+  Paper,
+  Typography,
+  Avatar,
+  CircularProgress,
+  Snackbar,
+  IconButton
+} from '@mui/material';
+import { styled } from '@mui/material/styles';
+import CloseIcon from '@mui/icons-material/Close';
+import AddAPhotoIcon from '@mui/icons-material/AddAPhoto';
+import { SelectChangeEvent } from '@mui/material';
 interface FormData {
   nombre: string;
   apellido: string;
@@ -33,6 +51,12 @@ const initialState: FormData = {
   email: '',
 };
 
+const areas = ['Sistemas', 'Administración', 'Depósito', 'Comercial', 'GerenciaOP', 'Contabilidad', 'Compras', 'TV'];
+const sucursales = ['PICO', 'MDP', 'DIMES'];
+
+const Input = styled('input')({
+  display: 'none',
+});
 
 const RegistroUsuario: React.FC = () => {
   const [formData, setFormData] = useState<FormData>(initialState);
@@ -43,12 +67,10 @@ const RegistroUsuario: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isUploadingPhoto, setIsUploadingPhoto] = useState<boolean>(false);
+  const [openSnackbar, setOpenSnackbar] = useState(false);
 
   const API_URL = process.env.REACT_APP_API_URL;
-  const areas = ['Sistemas', 'Administración', 'Depósito', 'Comercial', 'GerenciaOP','Contabilidad','Compras','TV'];
-  const sucursal = ['PICO', 'MDP', 'DIMES'];
   const fileInputRef = useRef<HTMLInputElement>(null);
-
 
   useEffect(() => {
     const colaboradorID = localStorage.getItem('colaboradorID');
@@ -75,10 +97,13 @@ const RegistroUsuario: React.FC = () => {
       console.error('Error al verificar el colaboradorID:', error);
       setColaboradorIDExiste(false);
       setError('No se pudo verificar el ID del colaborador. Por favor, intenta de nuevo.');
+      setOpenSnackbar(true);
     }
   };
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement >) => {
+ 
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement> | SelectChangeEvent<string>) => {
     const { name, value } = e.target;
     setFormData((prevData) => ({ ...prevData, [name]: value }));
   };
@@ -86,9 +111,10 @@ const RegistroUsuario: React.FC = () => {
   const uploadImage = async (file: File, colaboradorID: string): Promise<string> => {
     const formData = new FormData();
     formData.append('foto', file);
-    formData.append('colaboradorID', colaboradorID); // Añadimos el colaboradorID al FormData
-  
+    formData.append('colaboradorID', colaboradorID);
+
     try {
+      setIsUploadingPhoto(true);
       const response = await axios.post<{ ok: number; message: string; data: { fotoUrl: string } }>(
         `${API_URL}/usuarios-registrados/upload`,
         formData,
@@ -98,23 +124,18 @@ const RegistroUsuario: React.FC = () => {
           }
         }
       );
-  
+
       if (response.data.ok !== 1) {
         throw new Error(response.data.message);
       }
-  
+
       console.log('Imagen subida con éxito:', response.data);
       return response.data.data.fotoUrl;
     } catch (error) {
-      if (axios.isAxiosError(error)) {
-        console.error('Error de Axios:', error.message);
-        console.error('Datos de respuesta:', error.response?.data);
-        console.error('Estado de respuesta:', error.response?.status);
-        console.error('Cabeceras de respuesta:', error.response?.headers);
-      } else {
-        console.error('Error no Axios:', error);
-      }
+      console.error('Error al subir la imagen:', error);
       throw error;
+    } finally {
+      setIsUploadingPhoto(false);
     }
   };
 
@@ -162,9 +183,11 @@ const RegistroUsuario: React.FC = () => {
       }
 
       setSolicitudEnviada(true);
+      setOpenSnackbar(true);
     } catch (error) {
       console.error('Error al procesar la solicitud:', error);
       setError('Hubo un error al procesar tu solicitud. Por favor, intenta de nuevo.');
+      setOpenSnackbar(true);
     } finally {
       setIsLoading(false);
     }
@@ -174,169 +197,235 @@ const RegistroUsuario: React.FC = () => {
     setSolicitudEnviada(false);
   };
 
-  const PhotoUploadComponent = () => (
-    <div className="flex flex-col items-center mb-4">
-      <div 
-        onClick={handleImageClick}
-        className="w-24 h-24 rounded-full mb-2 cursor-pointer overflow-hidden"
-      >
-        {fotoPreview ? (
-          <img 
-            src={fotoPreview} 
-            alt="Foto Preview" 
-            className="w-full h-full object-cover"
-          />
-        ) : (
-          <div className="w-full h-full bg-gray-300 flex items-center justify-center">
-            <span className="text-gray-500 text-sm">Click para subir foto</span>
-          </div>
-        )}
-      </div>
-      <input 
-        type="file" 
-        ref={fileInputRef}
-        onChange={handleFileChange}
-        accept="image/*"
-        className="hidden"
-      />
-      {isUploadingPhoto && <p className="text-sm text-blue-500">Subiendo foto...</p>}
-    </div>
-  );
+  const handleCloseSnackbar = (event: React.SyntheticEvent | Event, reason?: string) => {
+    if (reason === 'clickaway') {
+      return;
+    }
+    setOpenSnackbar(false);
+  };
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-gray-100 p-4">
-      <PhotoUploadComponent />
-      {error && <p className="text-red-500 mb-4">{error}</p>}
-      {!solicitudEnviada ? (
-        <form onSubmit={handleSubmit} className="bg-gray-100 p-8 rounded-lg  w-full max-w-lg space-y-4">
-          <div className="flex items-center">
-            <div className="flex flex-col items-center">
-          </div>
-       
-              <input
-                type="text"
-                name="nombre"
-                placeholder="Nombre"
-                value={formData.nombre}
-                onChange={handleChange}
-                className="p-2 border rounded w-full"
-                required
-              />
-              <input
-                type="text"
-                name="apellido"
-                placeholder="Apellido"
-                value={formData.apellido}
-                onChange={handleChange}
-                className="p-2 w-full border rounded"
-                required
-              />
-            
-          </div>
-          <select
-            name="area"
-            value={formData.area}
-            onChange={handleChange}
-            className="p-2 w-full border rounded"
-            required
-          >
-            <option value="">Seleccione un área</option>
-            {areas.map((area) => (
-              <option key={area} value={area}>
-                {area}
-              </option>
-            ))}
-          </select>
-          <select
-            name="sucursal"
-            value={formData.sucursal}
-            onChange={handleChange}
-            className="p-2 w-full border rounded"
-            required
-          >
-            <option value="">Seleccione una Sucursal</option>
-            {sucursal.map((sucursal) => (
-              <option key={sucursal} value={sucursal}>
-                {sucursal}
-              </option>
-            ))}
-          </select>
-          <input
-            type="email"
-            name="email"
-            placeholder="Email"
-            value={formData.email}
-            onChange={handleChange}
-            className="p-2 w-full border rounded"
-            required
-          />
-          <input
-            type="date"
-            name="fechaNacimiento"
-            placeholder="Cumpleaños"
-            value={formData.fechaNacimiento}
-            onChange={handleChange}
-            className="p-2 w-full border rounded"
-            required
-          />
-          <input
-            type="text"
-            name="cuil"
-            placeholder="DNI"
-            value={formData.cuil}
-            onChange={handleChange}
-            className="p-2 w-full border rounded"
-            required
-          />
-          <input
-            type="text"
-            name="direccion"
-            placeholder="Dirección"
-            value={formData.direccion}
-            onChange={handleChange}
-            className="p-2 w-full border rounded"
-            required
-          />
-          <textarea
-            name="miFamilia"
-            placeholder="Más sobre mi"
-            value={formData.miFamilia}
-            onChange={handleChange}
-            className="p-2 w-full border rounded"
-            required
-          />
-          {error && <p className="text-red-500">{error}</p>}
-          <button 
-            type="submit" 
-            className="w-full bg-blue-500 text-white p-2 rounded"
-            disabled={isLoading}
-          >
-            {isLoading ? 'Enviando...' : 'Enviar'}
-          </button>
-        </form>
-      ) : (
-        <div className="bg-white p-8 rounded-lg shadow-lg w-full max-w-lg space-y-4">
-          <h3 className="text-xl mb-4">Datos del Registro</h3>
-          <p><strong>Nombre:</strong> {formData.nombre}</p>
-          <p><strong>Apellido:</strong> {formData.apellido}</p>
-          <p><strong>Fecha de Nacimiento:</strong> {formData.fechaNacimiento}</p>
-          <p><strong>Mi Familia:</strong> {formData.miFamilia}</p>
-          <p><strong>Dirección:</strong> {formData.direccion}</p>
-          <p><strong>Localidad:</strong> {formData.localidad}</p>
-          <p><strong>Sucursal:</strong> {formData.sucursal}</p>
-          <p><strong>Área:</strong> {formData.area}</p>
-          <p><strong>CUIL:</strong> {formData.cuil}</p>
+    <Grid container justifyContent="center" alignItems="center" style={{ minHeight: '100vh' }}>
+      <Grid item xs={12} sm={8} md={6}>
+        <Paper elevation={3} style={{ padding: '2rem', marginTop: '2rem' }}>
+          <Typography variant="h4" align="center" gutterBottom>
+            {solicitudEnviada ? 'Datos del Registro' : 'Mi Usuario'}
+          </Typography>
           
-          <p><strong>Email:</strong> {formData.email}</p>
-          <button
-            onClick={handleEdit}
-            className="w-full bg-yellow-500 text-white p-2 rounded mt-4"
-          >
-            Editar
-          </button>
-        </div>
-      )}
-    </div>
+          <Grid container justifyContent="center" style={{ marginBottom: '1rem' }}>
+            <input
+              accept="image/*"
+              style={{ display: 'none' }}
+              id="raised-button-file"
+              type="file"
+              onChange={handleFileChange}
+            />
+            <label htmlFor="raised-button-file">
+              <IconButton color="primary" aria-label="upload picture" component="span" onClick={handleImageClick}>
+                {fotoPreview ? (
+                  <Avatar src={fotoPreview} style={{ width: 100, height: 100 }} />
+                ) : (
+                  <Avatar style={{ width: 100, height: 100 }}>
+                    <AddAPhotoIcon />
+                  </Avatar>
+                )}
+              </IconButton>
+            </label>
+            {isUploadingPhoto && <CircularProgress size={24} style={{ marginLeft: 15 }} />}
+          </Grid>
+
+          {!solicitudEnviada ? (
+            <form onSubmit={handleSubmit}>
+              <Grid container spacing={2}>
+                <Grid item xs={12} sm={6}>
+                  <TextField
+                    fullWidth
+                    label="Nombre"
+                    name="nombre"
+                    value={formData.nombre}
+                    onChange={handleChange}
+                    required
+                  />
+                </Grid>
+                <Grid item xs={12} sm={6}>
+                  <TextField
+                    fullWidth
+                    label="Apellido"
+                    name="apellido"
+                    value={formData.apellido}
+                    onChange={handleChange}
+                    required
+                  />
+                </Grid>
+                <Grid item xs={12} sm={6}>
+                <FormControl fullWidth>
+  <InputLabel id="area-label">Área</InputLabel>
+  <Select
+    labelId="area-label"
+    name="area"
+    value={formData.area}
+    onChange={handleChange}
+    required
+  >
+    {areas.map((area) => (
+      <MenuItem key={area} value={area}>{area}</MenuItem>
+    ))}
+  </Select>
+</FormControl>
+                </Grid>
+                <Grid item xs={12} sm={6}>
+                  <FormControl fullWidth>
+                    <InputLabel>Sucursal</InputLabel>
+                    <Select
+                      name="sucursal"
+                      value={formData.sucursal}
+                      onChange={handleChange}
+                      required
+                    >
+                      {sucursales.map((sucursal) => (
+                        <MenuItem key={sucursal} value={sucursal}>{sucursal}</MenuItem>
+                      ))}
+                    </Select>
+                  </FormControl>
+                </Grid>
+                <Grid item xs={12}>
+                  <TextField
+                    fullWidth
+                    label="Email"
+                    name="email"
+                    type="email"
+                    value={formData.email}
+                    onChange={handleChange}
+                    required
+                  />
+                </Grid>
+                <Grid item xs={12} sm={6}>
+                  <TextField
+                    fullWidth
+                    label="Fecha de Nacimiento"
+                    name="fechaNacimiento"
+                    type="date"
+                    value={formData.fechaNacimiento}
+                    onChange={handleChange}
+                    InputLabelProps={{
+                      shrink: true,
+                    }}
+                    required
+                  />
+                </Grid>
+                <Grid item xs={12} sm={6}>
+                  <TextField
+                    fullWidth
+                    label="DNI"
+                    name="cuil"
+                    value={formData.cuil}
+                    onChange={handleChange}
+                    required
+                  />
+                </Grid>
+                <Grid item xs={12}>
+                  <TextField
+                    fullWidth
+                    label="Dirección"
+                    name="direccion"
+                    value={formData.direccion}
+                    onChange={handleChange}
+                    required
+                  />
+                </Grid>
+                <Grid item xs={12}>
+                  <TextField
+                    fullWidth
+                    label="Más sobre mi"
+                    name="miFamilia"
+                    multiline
+                    rows={4}
+                    value={formData.miFamilia}
+                    onChange={handleChange}
+                    required
+                  />
+                </Grid>
+              </Grid>
+              <Button
+                type="submit"
+                fullWidth
+                variant="contained"
+                color="primary"
+                style={{ marginTop: '1rem' }}
+                disabled={isLoading}
+              >
+                {isLoading ? <CircularProgress size={24} /> : 'Enviar'}
+              </Button>
+            </form>
+          ) : (
+            <Grid container spacing={2}>
+              <Grid item xs={12}>
+                <Typography><strong>Nombre:</strong> {formData.nombre}</Typography>
+              </Grid>
+              <Grid item xs={12}>
+                <Typography><strong>Apellido:</strong> {formData.apellido}</Typography>
+              </Grid>
+              <Grid item xs={12}>
+                <Typography><strong>Fecha de Nacimiento:</strong> {formData.fechaNacimiento}</Typography>
+              </Grid>
+              <Grid item xs={12}>
+                <Typography><strong>Más sobre mi:</strong> {formData.miFamilia}</Typography>
+              </Grid>
+              <Grid item xs={12}>
+                <Typography><strong>Dirección:</strong> {formData.direccion}</Typography>
+              </Grid>
+              <Grid item xs={12}>
+                <Typography><strong>Localidad:</strong> {formData.localidad}</Typography>
+              </Grid>
+              <Grid item xs={12}>
+                <Typography><strong>Sucursal:</strong> {formData.sucursal}</Typography>
+              </Grid>
+              <Grid item xs={12}>
+                <Typography><strong>Área:</strong> {formData.area}</Typography>
+              </Grid>
+              <Grid item xs={12}>
+                <Typography><strong>DNI:</strong> {formData.cuil}</Typography>
+              </Grid>
+              <Grid item xs={12}>
+                <Typography><strong>Email:</strong> {formData.email}</Typography>
+              </Grid>
+              <Grid item xs={12}>
+                <Button
+                  fullWidth
+                  variant="contained"
+                  color="secondary"
+                  onClick={handleEdit}
+                >
+                  Editar
+                </Button>
+              </Grid>
+            </Grid>
+          )}
+        </Paper>
+      </Grid>
+      <Snackbar
+        anchorOrigin={{
+          vertical: 'bottom',
+          horizontal: 'left',
+        }}
+        open={openSnackbar}
+        autoHideDuration={6000}
+        onClose={handleCloseSnackbar}
+        message={error || "Operación completada con éxito"}
+        action={
+          <React.Fragment>
+            <IconButton
+              size="small"
+              aria-label="close"
+              color="inherit"
+              onClick={handleCloseSnackbar}
+            >
+              <CloseIcon fontSize="small" />
+            </IconButton>
+          </React.Fragment>
+        }
+      />
+    </Grid>
   );
 };
 

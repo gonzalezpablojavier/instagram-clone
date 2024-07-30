@@ -9,6 +9,11 @@ interface Vacaciones {
   diasTotales: number;
   autorizado: string;
   colaboradorID: number;
+  vacacionesPendientes:number;
+  diasCorresponden:number;
+  diasDisponibles:number;
+  
+  
 }
 
 interface Colaborador {
@@ -90,7 +95,7 @@ const PanelAdminVacaciones: React.FC = () => {
 
   const handleApprove = async (id: number) => {
     try {
-      await axios.put(`${API_URL}/vacaciones/${id}`, { estado: 'Aprobado' });
+      await axios.put(`${API_URL}/vacaciones/${id}`, { autorizado: 'Aprobado' });
       fetchVacaciones();
     } catch (error) {
       setError('Error al aprobar las vacaciones');
@@ -100,7 +105,7 @@ const PanelAdminVacaciones: React.FC = () => {
 
   const handleReject = async (id: number) => {
     try {
-      await axios.put(`${API_URL}/vacaciones/${id}`, { estado: 'Rechazado' });
+      await axios.put(`${API_URL}/vacaciones/${id}`, { autorizado: 'Rechazado' });
       fetchVacaciones();
     } catch (error) {
       setError('Error al rechazar las vacaciones');
@@ -114,10 +119,48 @@ const PanelAdminVacaciones: React.FC = () => {
     return isValid(date) ? format(date, 'dd/MM/yyyy') : 'Fecha inválida';
   };
 
-  const calcularDiasTotales = (fechaInicio: string, fechaFin: string) => {
+  const calcularVacacionesPendientes = (vacacion: Vacaciones):number|'N/A' => {
+    try {
+     
+      return vacacion.vacacionesPendientes; // +1 para incluir el día de inicio
+      
+    } catch (error) {
+      console.error('Error al calcular los días totales:', error);
+      return 'N/A';
+    }
+  };
+
+  const calcularDiasCorresponen = (vacacion: Vacaciones):number|'N/A' => {
+    try {
+     
+      return vacacion.diasCorresponden; // +1 para incluir el día de inicio
+      
+    } catch (error) {
+      console.error('Error al calcular los días totales:', error);
+      return 'N/A';
+    }
+  };
+  const calcularDiasDisponibles = (vacacion: Vacaciones):number|'N/A' => {
+    const diasTotales = calcularDiasTotales(vacacion.fechaPermisoDesde, vacacion.fechaPermisoHasta);
+  
+  if (diasTotales === 'N/A' || typeof vacacion.diasDisponibles !== 'number') {
+    return 'N/A';
+  }
+
+  if (vacacion.autorizado === 'Aprobado') {
+    return  diasTotales;
+  } else {
+    return 0;
+  }
+  };
+
+  const calcularDiasTotales = (fechaInicio: string, fechaFin: string):number|'N/A' => {
     try {
       const inicio = parseISO(fechaInicio);
       const fin = parseISO(fechaFin);
+      if (!isValid(inicio) || !isValid(fin)) {
+        return 'N/A';
+      }
       return differenceInDays(fin, inicio) + 1; // +1 para incluir el día de inicio
     } catch (error) {
       console.error('Error al calcular los días totales:', error);
@@ -162,7 +205,14 @@ const PanelAdminVacaciones: React.FC = () => {
               <th className="px-4 py-2 text-left text-gray-600">Área</th>
               <th className="px-4 py-2 text-left text-gray-600">Inicio</th>
               <th className="px-4 py-2 text-left text-gray-600">Fin</th>
-              <th className="px-4 py-2 text-left text-gray-600">Días</th>
+              <th className="px-4 py-2 text-left text-gray-600">Pedido(Días)</th>
+              <th className="px-4 py-2 text-left text-gray-600">Corresponden</th>
+
+              <th className="px-4 py-2 text-left text-gray-600">Vac Pend</th>
+
+
+              <th className="px-4 py-2 text-left text-gray-600">Tomados</th>
+              
               <th className="px-4 py-2 text-left text-gray-600">Estado</th>
             </tr>
           </thead>
@@ -194,6 +244,11 @@ const PanelAdminVacaciones: React.FC = () => {
                   <td className="px-4 py-2">{formatDate(vacacion.fechaPermisoDesde)}</td>
                   <td className="px-4 py-2">{formatDate(vacacion.fechaPermisoHasta)}</td>
                   <td className="px-4 py-2">{calcularDiasTotales(vacacion.fechaPermisoDesde, vacacion.fechaPermisoHasta)}</td>
+                  <td className="px-4 py-2">{calcularDiasCorresponen(vacacion)}</td>
+               
+                  <td className="px-4 py-2">{calcularVacacionesPendientes(vacacion)}</td>
+                   <td className="px-4 py-2">{calcularDiasDisponibles(vacacion)}</td>
+                  
               
                   <td className="px-4 py-2">
                     <span className={`px-2 py-1 rounded text-sm ${

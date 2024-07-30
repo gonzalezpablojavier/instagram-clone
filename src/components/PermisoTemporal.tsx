@@ -105,10 +105,10 @@ const PermisoTemporal: React.FC = () => {
   return (
     <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={es}>
       <div className="min-h-screen flex flex-col items-center justify-center bg-gray-100 p-4">
-        <h1 className="text-2xl font-bold mb-4">Solicitud de Permiso Temporal</h1>
+        <h1 className="text-2xl font-bold mb-4">Mi Permiso</h1>
         {error && <p className="text-red-500">{error}</p>}
         {!solicitudEnviada ? (
-          <form onSubmit={handleSubmit} className="bg-white p-8 rounded-lg shadow-md w-full max-w-lg space-y-4">
+          <form onSubmit={handleSubmit} className="bg-gray-100 p-8 rounded-lg shadow-md w-full max-w-lg space-y-4">
             <DatePicker
               label="Fecha del Permiso"
               value={formData.fechaPermiso}
