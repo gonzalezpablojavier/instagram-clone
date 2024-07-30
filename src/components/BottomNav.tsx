@@ -10,10 +10,11 @@ const BottomNav: React.FC = () => {
 
   const navItems = [
     { path: Route.PermisoTemporal, icon: '/images/airport.svg', alt: 'Permiso temporal' },
+    { path: Route.Vacaciones, icon: '/images/vacaciones.png', alt: 'Permiso temporal' },
     { path: Route.Home, icon: '/images/home.svg', alt: 'Home' },
     { path: Route.HowAreYou, icon: '/images/star.svg', alt: 'How are you' },
     { path: Route.PanelPermisosTemporales, icon: '/images/key.png', alt: 'Panel Permisos' },
-  
+    { path: Route.PanelAdminVacaciones, icon: '/images/calendar.png', alt: 'Panel Permisos' },
   ];
 
   const isActive = (path: Route) => location.pathname === path;

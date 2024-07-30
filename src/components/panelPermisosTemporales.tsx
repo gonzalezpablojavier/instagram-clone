@@ -31,7 +31,9 @@ const AdminPermisosTemporal: React.FC = () => {
   const [filtroFecha, setFiltroFecha] = useState('');
   const [filtroColaborador, setFiltroColaborador] = useState('');
   const [error, setError] = useState<string | null>(null);
-  const areas = ['Sistemas', 'Administración', 'Depósito', 'Comercial', 'GO'];
+  const areas = ['Sistemas', 'Administración', 'Depósito', 'Comercial', 'GerenciaOP','Contabilidad','Compras','TV'];
+  const Motivos = ['Personal', 'Estudio', 'Salud', 'Tramites'];
+  
   const API_URL = process.env.REACT_APP_API_URL;
 
   useEffect(() => {
@@ -114,7 +116,7 @@ const AdminPermisosTemporal: React.FC = () => {
 
   return (
     <div className="container mx-auto p-6 bg-gray-100 min-h-screen">
-      <h1 className="text-3xl font-bold mb-8 text-gray-800">Permisos Temporales</h1>
+      <h1 className="text-3xl font-bold mb-8 text-gray-800">Administración de Permisos</h1>
       
       {error && <p className="text-red-500 mb-4 bg-red-100 p-3 rounded">{error}</p>}
       

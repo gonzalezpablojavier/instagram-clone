@@ -10,7 +10,10 @@ import Presentismo from './components/Presentismo';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import ManageMoods from './components/ManageMoods';
 import PanelPermisosTemporales from './components/panelPermisosTemporales';
+import PanelAdminVacaciones from './components/panelAdminVacaciones';
 import Home from './components/Home';
+import Vacaciones from './components/Vacaciones';
+
 import Unauthorized from './components/Unauthorized';
 import { Route } from './config/permissions';
 
@@ -56,6 +59,25 @@ const AppContent: React.FC = () => {
                 <ProtectedRouteWithPermission
                   path={Route.PanelPermisosTemporales}
                   element={<PanelPermisosTemporales />}
+                />
+              }
+            />
+
+              <RouterRoute
+              path={Route.PanelAdminVacaciones}
+              element={
+                <ProtectedRouteWithPermission
+                  path={Route.PanelAdminVacaciones}
+                  element={<PanelAdminVacaciones />}
+                />
+              }
+            />
+            <RouterRoute
+              path={Route.Vacaciones}
+              element={
+                <ProtectedRouteWithPermission
+                  path={Route.Vacaciones}
+                  element={<Vacaciones />}
                 />
               }
             />

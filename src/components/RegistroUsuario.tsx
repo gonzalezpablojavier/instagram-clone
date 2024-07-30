@@ -45,7 +45,7 @@ const RegistroUsuario: React.FC = () => {
   const [isUploadingPhoto, setIsUploadingPhoto] = useState<boolean>(false);
 
   const API_URL = process.env.REACT_APP_API_URL;
-  const areas = ['Sistemas', 'Administración', 'Depósito', 'Comercial', 'GO','Contabilidad','Compras','TV'];
+  const areas = ['Sistemas', 'Administración', 'Depósito', 'Comercial', 'GerenciaOP','Contabilidad','Compras','TV'];
   const sucursal = ['PICO', 'MDP', 'DIMES'];
   const fileInputRef = useRef<HTMLInputElement>(null);
 
