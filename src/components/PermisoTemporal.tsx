@@ -53,6 +53,9 @@ const PermisoTemporal: React.FC = () => {
   const handleAreaChange = (event: SelectChangeEvent<string>) => {
     setFormData((prevData) => ({ ...prevData, area: event.target.value }));
   };
+  const handleMotivoChange = (event: SelectChangeEvent<string>) => {
+    setFormData((prevData) => ({ ...prevData, motivo: event.target.value }));
+  };
 
   const handleDateChange = (date: Date | null) => {
     setFormData(prevData => ({
@@ -134,7 +137,7 @@ const PermisoTemporal: React.FC = () => {
               <Select
                 labelId="motivo-label"
                 value={formData.motivo}
-                onChange={handleAreaChange}
+                onChange={handleMotivoChange}
                 label="Motivo"
               >
                 {motivos.map((motivo) => (
