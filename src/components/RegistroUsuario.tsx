@@ -19,6 +19,18 @@ import { styled } from '@mui/material/styles';
 import CloseIcon from '@mui/icons-material/Close';
 import AddAPhotoIcon from '@mui/icons-material/AddAPhoto';
 import { SelectChangeEvent } from '@mui/material';
+
+
+
+const GreyBackground = styled('div')(({ theme }) => ({
+  backgroundColor: theme.palette.grey[200], // Un gris más oscuro para el fondo
+  minHeight: '100vh',
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  padding: theme.spacing(3),
+}));
+
 interface FormData {
   nombre: string;
   apellido: string;
@@ -205,8 +217,11 @@ const RegistroUsuario: React.FC = () => {
   };
 
   return (
+    <GreyBackground>
     <Grid container justifyContent="center" alignItems="center" style={{ minHeight: '100vh' }}>
+    
       <Grid item xs={12} sm={8} md={6}>
+      <GreyBackground>
         <Paper elevation={3} style={{ padding: '2rem', marginTop: '2rem' }}>
           <Typography variant="h4" align="center" gutterBottom>
             {solicitudEnviada ? 'Datos del Registro' : 'Mi Usuario'}
@@ -235,6 +250,7 @@ const RegistroUsuario: React.FC = () => {
           </Grid>
 
           {!solicitudEnviada ? (
+           
             <form onSubmit={handleSubmit}>
               <Grid container spacing={2}>
                 <Grid item xs={12} sm={6}>
@@ -357,6 +373,9 @@ const RegistroUsuario: React.FC = () => {
                 {isLoading ? <CircularProgress size={24} /> : 'Enviar'}
               </Button>
             </form>
+          
+
+
           ) : (
             <Grid container spacing={2}>
               <Grid item xs={12}>
@@ -402,7 +421,9 @@ const RegistroUsuario: React.FC = () => {
             </Grid>
           )}
         </Paper>
+        </GreyBackground>
       </Grid>
+      
       <Snackbar
         anchorOrigin={{
           vertical: 'bottom',
@@ -426,6 +447,7 @@ const RegistroUsuario: React.FC = () => {
         }
       />
     </Grid>
+    </GreyBackground>
   );
 };
 

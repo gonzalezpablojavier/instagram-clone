@@ -118,6 +118,12 @@ const Home: React.FC = () => {
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-gray-100 p-4">
+         {profile && profile.nombre ? (
+   <div></div>
+      ):(     <div className="w-full max-w-5xl mx-auto mb-4 bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4" role="alert">
+        <p className="font-bold">Atención</p>
+        <p>Por favor, completa tus datos de registro en el perfil para una mejor experiencia.</p>
+      </div>)}
    
       <main className="flex-grow mt-16 w-full max-w-5xl mx-auto">
        
