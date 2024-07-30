@@ -11,6 +11,7 @@ const Home: React.FC = () => {
   const [colaboradorID, setColaboradorID] = useState<string | null>(null);
   const [presentTime, setPresentTime] = useState<any>(null);
   const [solicitud, setSolicitud] = useState<any>(null);
+  const [solicitudVacaciones, setSolicitudVacaciones] = useState<any>(null);
   const API_URL = process.env.REACT_APP_API_URL;
 
 
@@ -84,6 +85,17 @@ const Home: React.FC = () => {
         
      
     };
+
+         // Fetch present time
+    const fetchSolicitudVacaciones = async () => {
+     
+          const response = await axios.get(`${API_URL}/vacaciones/latest/${colaboradorID}`);
+          
+            setSolicitudVacaciones(response.data);
+          
+       
+      };
+    fetchSolicitudVacaciones();
     fetchSolicitud();
     fetchProfile();
     fetchLastMood();
@@ -182,6 +194,18 @@ const Home: React.FC = () => {
             </div>   
           </div>
 
+          <div className={`${getBgColor(solicitudVacaciones?.autorizado)} text-white p-4 rounded shadow flex flex-col items-center justify-center`}>
+       
+       <div className="flex space-x-4">
+       <img src="/images/vacaciones.png" width={38}></img>
+         </div> 
+         <div className="flex space-x-8">         
+             <h2 className="text-2xl font-semibold mb-4 text-center items-center justify-center font-montserrat">{solicitudVacaciones ? ` ${solicitudVacaciones.autorizado}` : ''}</h2>
+         </div>   
+         <div className="flex space-x-8">         
+           </div>  
+       </div>
+       
 
         </div>
       </main>
