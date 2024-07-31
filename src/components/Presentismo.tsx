@@ -125,7 +125,7 @@ const Presentismo: React.FC = () => {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center bg-gray-100 p-4 rounded">
+    <div className="flex flex-col items-center justify-center bg-white-100 p-4 rounded">
       <div className="mb-4">
         <label className={`cursor-pointer inline-block px-4 py-2 rounded-full border-2 border-blue-950 text-white-950 font-bold transition-all duration-300 mr-2 ${
           tipo === 'entrada' ? 'bg-blue-950 text-white' : 'bg-white'
