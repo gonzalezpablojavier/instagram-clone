@@ -96,6 +96,30 @@ const PanelAdminVacaciones: React.FC = () => {
   const handleApprove = async (id: number) => {
     try {
       await axios.put(`${API_URL}/vacaciones/${id}`, { autorizado: 'Aprobado' });
+
+
+
+       // Obtener los detalles de la vacación aprobada
+       const vacacionAprobada = vacaciones.find(v => v.id === id);
+       if (!vacacionAprobada) {
+         throw new Error('No se encontró la vacación aprobada');
+       }
+        // Obtener los detalles del colaborador
+      const colaborador = colaboradores.find(c => c.colaboradorID === vacacionAprobada.colaboradorID);
+      if (!colaborador) {
+          throw new Error('No se encontró el colaborador');
+      }
+
+      // Enviar solicitud para crear evento en Google Calendar
+      await axios.post(`${API_URL}/create-calendar-event`, {
+       summary: `Vacaciones de ${colaborador.nombre} ${colaborador.apellido}`,
+      description: `Vacaciones aprobadas para ${colaborador.nombre} ${colaborador.apellido} del área de ${colaborador.area}`,
+      start: vacacionAprobada.fechaPermisoDesde,
+      end: vacacionAprobada.fechaPermisoHasta,
+      colaboradorId: colaborador.colaboradorID
+});
+
+
       fetchVacaciones();
     } catch (error) {
       setError('Error al aprobar las vacaciones');

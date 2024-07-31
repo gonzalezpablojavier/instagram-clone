@@ -1,22 +1,34 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect,useCallback  } from 'react';
 import axios from 'axios';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { TextField, Button, Select, MenuItem, FormControl, InputLabel, Box, SelectChangeEvent } from '@mui/material';
 import { es } from 'date-fns/locale';
+const initialState = {
+  fechaPermiso: null,
+  colaboradorCubre: '',
+  motivo: '',
+  area: '',
+  observacion: '',
+  horario: '',
+  autorizado: 'Evaluando',
+  colaboradorID: ''
+};
+
+interface FormData {
+  fechaPermiso: Date | null;
+  colaboradorCubre: string;
+  motivo: string;
+  area: string;
+  observacion: string;
+  horario: string;
+  autorizado: string;
+  colaboradorID: string;
+}
 
 const PermisoTemporal: React.FC = () => {
-  const [formData, setFormData] = useState({
-    fechaPermiso: null as Date | null,
-    colaboradorCubre: '',
-    motivo: '',
-    area: '',
-    observacion: '',
-    horario: '',
-    autorizado: 'Evaluando',
-    colaboradorID: ''
-  });
+  const [formData, setFormData] = useState<FormData>(initialState);
   const [solicitudEnviada, setSolicitudEnviada] = useState(false);
   const [ultimoPermiso, setUltimoPermiso] = useState<any>(null);
   const [error, setError] = useState<string | null>(null);
@@ -24,6 +36,27 @@ const PermisoTemporal: React.FC = () => {
   const API_URL = process.env.REACT_APP_API_URL;
   const areas = ['Sistemas', 'Administración', 'Depósito', 'Comercial', 'GerenciaOP','Contabilidad','Compras','TV'];
   const motivos = ['Personal', 'Estudio', 'Salud', 'Tramites'];
+  const [refreshKey, setRefreshKey] = useState(0);
+
+
+  const verificarUltimoPermiso = useCallback(async (colaboradorID: string) => {
+    try {
+      const response = await axios.get(`${API_URL}/permiso-temporal/latest/${colaboradorID}`);
+      console.log('Último permiso:', response.data);
+      if (response.data && response.data.autorizado === 'Evaluando') {
+        setUltimoPermiso(response.data);
+        setSolicitudEnviada(true);
+      } else {
+        setSolicitudEnviada(false);
+        setUltimoPermiso(null);
+      }
+    } catch (error) {
+      console.error('Error al verificar el último permiso temporal:', error);
+      setSolicitudEnviada(false);
+      setUltimoPermiso(null);
+    }
+  }, [API_URL]);
+
 
   useEffect(() => {
     const colaboradorID = localStorage.getItem('colaboradorID');
@@ -31,19 +64,9 @@ const PermisoTemporal: React.FC = () => {
       setFormData((prevData) => ({ ...prevData, colaboradorID }));
       verificarUltimoPermiso(colaboradorID);
     }
-  }, []);
+  }, [verificarUltimoPermiso, refreshKey]);
 
-  const verificarUltimoPermiso = async (colaboradorID: string) => {
-    try {
-      const response = await axios.get(`${API_URL}/permiso-temporal/latest/${colaboradorID}`);
-      if (response.data && response.data.autorizado === 'Evaluando') {
-        setUltimoPermiso(response.data);
-        setSolicitudEnviada(true);
-      }
-    } catch (error) {
-      console.error('Error al verificar el último permiso temporal:', error);
-    }
-  };
+
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -73,8 +96,11 @@ const PermisoTemporal: React.FC = () => {
     try {
       const response = await axios.post(`${API_URL}/permiso-temporal`, dataToSend);
       if (response.status === 201) {
+        setRefreshKey(oldKey => oldKey + 1);  // Forzar actualización
         setSolicitudEnviada(true);
         setUltimoPermiso(response.data);
+        // Limpiar el formulario después de enviar
+        setFormData(initialState);
       } else {
         setError('Error al enviar la solicitud');
       }
@@ -90,6 +116,8 @@ const PermisoTemporal: React.FC = () => {
       const response = await axios.delete(`${API_URL}/permiso-temporal/delete-last-evaluating/${formData.colaboradorID}`);
       if (response.status === 200) {
         setFormData({ ...formData, fechaPermiso: null, colaboradorCubre: '', motivo: '', observacion: '', horario: '', autorizado: 'Evaluando' });
+        setRefreshKey(oldKey => oldKey + 1);  // Forzar actualización después de eliminar
+    
         setSolicitudEnviada(false);
         setUltimoPermiso(null);
         setError(null);

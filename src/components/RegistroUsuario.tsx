@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef ,useCallback} from 'react';
 import axios from 'axios';
 import {
   TextField,
@@ -80,17 +80,46 @@ const RegistroUsuario: React.FC = () => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isUploadingPhoto, setIsUploadingPhoto] = useState<boolean>(false);
   const [openSnackbar, setOpenSnackbar] = useState(false);
-
+  const [refreshKey, setRefreshKey] = useState(0);
   const API_URL = process.env.REACT_APP_API_URL;
   const fileInputRef = useRef<HTMLInputElement>(null);
+  
+  const fetchUserData = useCallback(async (colaboradorID: string) => {
+    try {
+      const response = await axios.get<{ ok: number; data: FormData }>(`${API_URL}/usuarios-registrados/${colaboradorID}`);
+      if (response.data.ok === 1) {
+        setFormData(response.data.data);
+        setColaboradorIDExiste(true);
+        if (response.data.data.foto) {
+          setFotoPreview(response.data.data.foto);
+        }
+      } else {
+        console.log('No se encontró el colaboradorID, se creará uno nuevo.');
+        setColaboradorIDExiste(false);
+      }
+    } catch (error) {
+      console.error('Error al verificar el colaboradorID:', error);
+      setColaboradorIDExiste(false);
+      setError('No se pudo verificar el ID del colaborador. Por favor, intenta de nuevo.');
+      setOpenSnackbar(true);
+    }
+  }, [API_URL]);
+
 
   useEffect(() => {
     const colaboradorID = localStorage.getItem('colaboradorID');
     if (colaboradorID) {
       setFormData((prevData) => ({ ...prevData, colaboradorID }));
-      verificarColaboradorID(colaboradorID);
+      fetchUserData(colaboradorID);
     }
-  }, []);
+  
+    // Configurar actualización automática cada 5 minutos
+    const intervalId = setInterval(() => {
+      setRefreshKey(oldKey => oldKey + 1);
+    }, 300000); // 5 minutos
+  
+    return () => clearInterval(intervalId);
+  }, [fetchUserData, refreshKey]);
 
   const verificarColaboradorID = async (colaboradorID: string) => {
     try {

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState,useCallback } from 'react';
 import axios from 'axios';
 import HowAreYou from './HowAreYou';
 import { useAuth } from '../context/AuthContext';
@@ -12,6 +12,7 @@ const Home: React.FC = () => {
   const [presentTime, setPresentTime] = useState<any>(null);
   const [solicitud, setSolicitud] = useState<any>(null);
   const [solicitudVacaciones, setSolicitudVacaciones] = useState<any>(null);
+  const [refreshKey, setRefreshKey] = useState(0);
   const API_URL = process.env.REACT_APP_API_URL;
 
 
@@ -32,75 +33,52 @@ const Home: React.FC = () => {
       setColaboradorID(colaboradorID);
     }
   }, []);
- 
-  useEffect(() => {
-   
-    // Fetch profile data
-    const fetchProfile = async () => {       
-        console.log('Realizando solicitud de perfil para colaboradorID:', colaboradorID);     
-        try {
-       
-            const response = await axios.get(`${API_URL}/usuarios-registrados/${colaboradorID}`);
-            if (response.data.ok === 1) {
-              setProfile(response.data.data);
-            } else {
-              console.error('Error fetching profile data:', response.data.message);
-            }
-          } catch (error) {
-            console.error('Error fetching profile data:', error);
-          }
-      
-    };
 
-    // Fetch last mood
-    const fetchLastMood = async () => {
-     
-        try{        
-            const response = await axios.get(`${API_URL}/howareyou/${colaboradorID}/last`);
-            if (response.data.ok ===1) {
-                setLastMood(response.data.data);
-            }
-        } catch (error) {
-            console.error('Error fetching mood data:', error);
-        }
-      
-    };
 
-    // Fetch present time
-    const fetchPresentTime = async () => {
-     
-        const response = await axios.get(`${API_URL}/presentismo/${colaboradorID}/last`);
-        if (response.data.ok===1) {
-          setPresentTime(response.data.data);
-        }
-     
-    };
+  const fetchData = useCallback(async () => {
+    if (!colaboradorID) return;
+
+    try {
+      // Fetch profile data
+      const profileResponse = await axios.get(`${API_URL}/usuarios-registrados/${colaboradorID}`);
+      if (profileResponse.data.ok === 1) {
+        setProfile(profileResponse.data.data);
+      }
+
+      // Fetch last mood
+      const moodResponse = await axios.get(`${API_URL}/howareyou/${colaboradorID}/last`);
+      if (moodResponse.data.ok === 1) {
+        setLastMood(moodResponse.data.data);
+      }
 
       // Fetch present time
-      const fetchSolicitud = async () => {
-     
-        const response = await axios.get(`${API_URL}/permiso-temporal/latest/${colaboradorID}`);
-        
-          setSolicitud(response.data);
-        
-     
-    };
+      const presentTimeResponse = await axios.get(`${API_URL}/presentismo/${colaboradorID}/last`);
+      if (presentTimeResponse.data.ok === 1) {
+        setPresentTime(presentTimeResponse.data.data);
+      }
 
-         // Fetch present time
-    const fetchSolicitudVacaciones = async () => {
-     
-          const response = await axios.get(`${API_URL}/vacaciones/latest/${colaboradorID}`);
-          
-            setSolicitudVacaciones(response.data);
-          
-       
-      };
-    fetchSolicitudVacaciones();
-    fetchSolicitud();
-    fetchProfile();
-    fetchLastMood();
-    fetchPresentTime();
-  }, [colaboradorID]);
+      // Fetch permiso temporal
+      const solicitudResponse = await axios.get(`${API_URL}/permiso-temporal/latest/${colaboradorID}`);
+      setSolicitud(solicitudResponse.data);
+
+      // Fetch solicitud vacaciones
+      const vacacionesResponse = await axios.get(`${API_URL}/vacaciones/latest/${colaboradorID}`);
+      setSolicitudVacaciones(vacacionesResponse.data);
+
+    } catch (error) {
+      console.error('Error fetching data:', error);
+    }
+  }, [colaboradorID, API_URL]);
+
+ 
+  useEffect(() => {
+   fetchData();
+  const intervalId = setInterval(() => {
+      setRefreshKey(oldKey => oldKey + 1);
+    }, 30000);
+ // Limpiar el intervalo cuando el componente se desmonte
+    return () => clearInterval(intervalId);
+  }, [colaboradorID,refreshKey]);
 
   const renderMoodIcon = (mood: string) => {
     if (mood === 'muy bien') {
