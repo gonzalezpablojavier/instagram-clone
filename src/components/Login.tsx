@@ -7,30 +7,43 @@ const Login: React.FC = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
   const { login } = useAuth();
   const navigate = useNavigate();
   const API_URL = process.env.REACT_APP_API_URL;
+  const MAX_RETRIES = 3;
+  const RETRY_DELAY = 1000; // 1 second
+
+
+
+  const attemptLogin = async (retries = 0): Promise<void> => {
+    try {
+      const response = await axios.post(`${API_URL}/auth/login`, { username, password });
+      const { colaboradorID, access_token } = response.data;
+      localStorage.setItem('access_token', access_token);
+      login(colaboradorID);
+      navigate(Route.Home);
+    } catch (err) {
+      if (retries < MAX_RETRIES) {
+        setError(`Intento ${retries + 1} fallido. Reintentando...`);
+        setTimeout(() => attemptLogin(retries + 1), RETRY_DELAY);
+      } else {
+        setError('Credenciales inválidas después de múltiples intentos');
+      }
+    }
+  };
+
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (isLoading) return;
+    setIsLoading(true);
     setError('');
+    await attemptLogin();
+    setIsLoading(false);
+  
 
-    try {
 
-      const response = await axios.post(`${API_URL}/auth/login`, { username, password });
-      const { colaboradorID, access_token } = response.data;
-
-      // Almacena el token JWT si lo necesitas para futuras solicitudes
-      localStorage.setItem('access_token', access_token);
-
-      // Llama a la función login del contexto de autenticación
-      login(colaboradorID);
-
-      // Redirige al usuario a la página principal
-      navigate(Route.Home);
-    } catch (err) {
-      setError('Credenciales inválidas');
-    }
   };
 
   return (
