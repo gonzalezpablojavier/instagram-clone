@@ -31,7 +31,7 @@ const PanelAdminVacaciones: React.FC = () => {
   const [filtroArea, setFiltroArea] = useState('');
   const [filtroFecha, setFiltroFecha] = useState('');
   const [error, setError] = useState<string | null>(null);
-  const areas = ['Sistemas', 'Administración', 'Depósito', 'Comercial', 'GerenciaOP', 'Contabilidad', 'Compras', 'TV'];
+  const areas = ['Sistemas', 'Administración', 'Depósito', 'Comercial', 'GerenciaOP', 'Contabilidad', 'Compras', 'TV','Gerencia'];
   
   const API_URL = process.env.REACT_APP_API_URL;
 

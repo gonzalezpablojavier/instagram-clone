@@ -63,7 +63,7 @@ const initialState: FormData = {
   email: '',
 };
 
-const areas = ['Sistemas', 'Administración', 'Depósito', 'Comercial', 'GerenciaOP', 'Contabilidad', 'Compras', 'TV'];
+const areas = ['Sistemas', 'Administración', 'Depósito', 'Comercial', 'GerenciaOP', 'Contabilidad', 'Compras', 'TV','Gerencia'];
 const sucursales = ['PICO', 'MDP', 'DIMES'];
 
 const Input = styled('input')({

@@ -26,7 +26,7 @@ const PanelFeedBack: React.FC = () => {
   const [filtroFecha, setFiltroFecha] = useState('');
   const [filtroTipo, setFiltroTipo] = useState('');
   const [error, setError] = useState<string | null>(null);
-  const areas = ['Sistemas', 'Administración', 'Depósito', 'Comercial', 'GerenciaOP', 'Contabilidad', 'Compras', 'TV'];
+  const areas = ['Sistemas', 'Administración', 'Depósito', 'Comercial', 'GerenciaOP', 'Contabilidad', 'Compras', 'TV','Gerencia'];
   const tipos = ['Nos comunicamos', 'revision', 'felicitacion', 'Otro'];
   const habitos = [
     'Nos orientamos al cliente', 'Comunicamos(preguntamos)', '80/20', 'Somos protagonistas',
