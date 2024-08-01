@@ -102,7 +102,7 @@ const FeedbackColaborador: React.FC = () => {
         tipo: tipo
       };
       const response = await axios.post(`${API_URL}/feedback`, feedbackData);
-      setMensaje(`Feedback enviado exitosamente: ${response.data.message}`);
+      setMensaje(`Enviado exitosamente`);
       // Limpiar el formulario
       setSelectedColaboradorDestino(null);
       setSearchTerm('');
@@ -154,7 +154,7 @@ const FeedbackColaborador: React.FC = () => {
               onChange={(e) => setSelectedNorma(e.target.value)}
               className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
             >
-              <option value="">Seleccione una norma</option>
+              <option value="">Seleccione un hábito</option>
               {normas.map((norma) => (
                 <option key={norma.id} value={norma.id}>{norma.descripcion}</option>
               ))}
