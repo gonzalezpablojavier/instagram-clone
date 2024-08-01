@@ -9,6 +9,8 @@ export enum Route {
   Presentismo = '/presentismo',
   Vacaciones = '/Vacaciones',
   Login = '/login',
+  FeedbackColaborador= '/FeedbackColaborador',
+  PanelFeedBack= '/PanelFeedBack',
   Unauthorized = '/unauthorized'
 }
 
@@ -20,13 +22,16 @@ export const ROUTE_PERMISSIONS: { [key in Route]: string[] } = {
   [Route.PermisoTemporal]: ['all'],
   [Route.HowAreYou]: ['all'],
   [Route.PanelPermisosTemporales]: [...ADMIN_IDS, ...MANAGER_IDS],
-  [Route.PanelAdminVacaciones]: [...ADMIN_IDS, ...MANAGER_IDS],  
+  [Route.PanelAdminVacaciones]: [...ADMIN_IDS, ...MANAGER_IDS], 
+  [Route.PanelFeedBack]: [...ADMIN_IDS, ...MANAGER_IDS],  
   [Route.ManageMoods]: ADMIN_IDS,
   [Route.Registro]: ['all'],
   [Route.Presentismo]: ['all'],
   [Route.Vacaciones]: ['all'],
   [Route.Login]: ['all'],
-  [Route.Unauthorized]: ['all']
+  [Route.Unauthorized]: ['all'],
+  [Route.FeedbackColaborador]: ['all']
+  
 };
 
 export const hasPermission = (colaboradorID: string, route: Route): boolean => {

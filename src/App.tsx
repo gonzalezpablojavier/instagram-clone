@@ -11,9 +11,10 @@ import { AuthProvider, useAuth } from './context/AuthContext';
 import ManageMoods from './components/ManageMoods';
 import PanelPermisosTemporales from './components/panelPermisosTemporales';
 import PanelAdminVacaciones from './components/panelAdminVacaciones';
+import PanelFeedBack from './components/panelFeedBack';
 import Home from './components/Home';
 import Vacaciones from './components/Vacaciones';
-
+import FeedbackColaborador from './components/FeedbackColaborador';
 import Unauthorized from './components/Unauthorized';
 import { Route } from './config/permissions';
 
@@ -59,6 +60,27 @@ const AppContent: React.FC = () => {
                 <ProtectedRouteWithPermission
                   path={Route.PanelPermisosTemporales}
                   element={<PanelPermisosTemporales />}
+                />
+              }
+            />
+
+
+            <RouterRoute
+              path={Route.PanelFeedBack}
+              element={
+                <ProtectedRouteWithPermission
+                  path={Route.PanelFeedBack}
+                  element={<PanelFeedBack />}
+                />
+              }
+            />
+
+            <RouterRoute
+              path={Route.FeedbackColaborador}
+              element={
+                <ProtectedRouteWithPermission
+                  path={Route.FeedbackColaborador}
+                  element={<FeedbackColaborador />}
                 />
               }
             />
