@@ -199,7 +199,7 @@ const Home: React.FC = () => {
 
 
           <GridButton 
-            bgColor="bg-green-500" 
+            bgColor="bg-cyan-500" 
             onClick={() => navigate('/reconocemos')}
             title="Ranking"
             description=""

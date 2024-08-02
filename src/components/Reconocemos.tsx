@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { format, startOfYear, endOfYear } from 'date-fns';
+import { format, parse, startOfMonth, endOfMonth, startOfYear, endOfYear, isValid } from 'date-fns';
 import { es } from 'date-fns/locale';
 
 interface Feedback {
@@ -35,8 +35,12 @@ const Reconocemos: React.FC = () => {
   const [colaboradores, setColaboradores] = useState<Colaborador[]>([]);
   const [rankingAnual, setRankingAnual] = useState<RankingItem[]>([]);
   const [rankingMensual, setRankingMensual] = useState<RankingItem[]>([]);
-  const [añoSeleccionado, setAñoSeleccionado] = useState<number>(new Date().getFullYear());
-  const [mesSeleccionado, setMesSeleccionado] = useState<number>(new Date().getMonth());
+  const [fechaSeleccionada, setFechaSeleccionada] = useState<string>(
+    format(new Date(), 'MM/yyyy')
+  );
+  const [fechaInput, setFechaInput] = useState<string>(
+    format(new Date(), 'MM/yyyy')
+  );
   const [error, setError] = useState<string | null>(null);
   
   const API_URL = process.env.REACT_APP_API_URL;
@@ -48,10 +52,9 @@ const Reconocemos: React.FC = () => {
 
   useEffect(() => {
     if (feedbacks.length > 0 && colaboradores.length > 0) {
-      calcularRankingAnual();
-      calcularRankingMensual();
+      calcularRankings();
     }
-  }, [feedbacks, colaboradores, añoSeleccionado, mesSeleccionado]);
+  }, [feedbacks, colaboradores, fechaSeleccionada]);
 
   const fetchFeedbacks = async () => {
     try {
@@ -95,55 +98,69 @@ const Reconocemos: React.FC = () => {
         colaboradorID: colaborador.colaboradorID,
         nombre: colaborador.nombre,
         apellido: colaborador.apellido,
-        foto: "https://distrisuperapis.com.ar/images_rrhh/user-4250.png",
+        foto: colaborador.foto,
         felicitaciones,
         revisiones,
         puntaje
       };
     });
 
-    // Filtrar solo los colaboradores con puntos positivos y ordenar
     return ranking.filter(item => item.puntaje > 0)
                   .sort((a, b) => b.puntaje - a.puntaje);
   };
 
-  const calcularRankingAnual = () => {
-    const inicio = startOfYear(new Date(añoSeleccionado, 0, 1));
-    const fin = endOfYear(new Date(añoSeleccionado, 0, 1));
-    setRankingAnual(calcularRanking(inicio, fin));
+  const calcularRankings = () => {
+    const fecha = parse(fechaSeleccionada, 'MM/yyyy', new Date());
+    if (!isValid(fecha)) {
+      setError('Fecha inválida');
+      return;
+    }
+    
+    const inicioMes = startOfMonth(fecha);
+    const finMes = endOfMonth(fecha);
+    const inicioAño = startOfYear(fecha);
+    const finAño = endOfYear(fecha);
+
+    setRankingMensual(calcularRanking(inicioMes, finMes));
+    setRankingAnual(calcularRanking(inicioAño, finAño));
+    setError(null);
   };
 
-  const calcularRankingMensual = () => {
-    const inicio = new Date(añoSeleccionado, mesSeleccionado, 1);
-    const fin = new Date(añoSeleccionado, mesSeleccionado + 1, 0);
-    setRankingMensual(calcularRanking(inicio, fin));
+  const handleFechaChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const valor = e.target.value;
+    setFechaInput(valor);
+
+    if (valor.length === 7 && /^(0[1-9]|1[0-2])\/\d{4}$/.test(valor)) {
+      setFechaSeleccionada(valor);
+    }
   };
 
   const RankingTable = ({ ranking, title }: { ranking: RankingItem[], title: string }) => (
-    <div className="mt-8">
-      <h2 className="text-2xl font-bold mb-4">{title}</h2>
+    <div className="mt-4">
+      <h2 className="text-xl font-bold mb-2">{title}</h2>
       <div className="overflow-x-auto">
         <table className="w-full table-auto">
           <thead className="bg-blue-100">
             <tr>
-              <th className="px-4 py-2 text-left">Posición</th>
-              <th className="px-4 py-2 text-left">Puntaje</th>
-              <th className="px-4 py-2 text-left">Colaborador</th>
-              <th className="px-4 py-2 text-left">Felicitaciones</th>
-              <th className="px-4 py-2 text-left">Revisiones</th>
+              <th className="px-2 py-1 text-left text-sm">Pos</th>
+              <th className="px-2 py-1 text-left text-sm">Colaborador</th>
+              <th className="px-2 py-1 text-left text-sm">Pts</th>         
+              <th className="px-2 py-1 text-left text-sm">Fel</th>
+              <th className="px-2 py-1 text-left text-sm">Rev</th>
             </tr>
           </thead>
           <tbody>
             {ranking.map((item, index) => (
               <tr key={item.colaboradorID} className={index % 2 === 0 ? 'bg-green-50' : 'bg-yellow-50'}>
-                <td className="px-4 py-2">{index + 1}</td>
-                <td className="px-4 py-2 font-bold">{item.puntaje}</td>
-                <td className="px-4 py-2 flex items-center">
-                  <img src={item.foto || '/images/default-avatar.png'} alt={`${item.nombre} ${item.apellido}`} className="w-10 h-10 rounded-full mr-2" />
-                  {`${item.nombre} ${item.apellido}`}
+                <td className="px-2 py-1 text-sm">{index + 1}</td>
+       
+                <td className="px-2 py-1 text-sm flex items-center">
+                  <img src={'/images/winner-cup-7807.png'} alt={`${item.nombre} ${item.apellido}`} className="w-8 h-8 rounded-full mr-1" />
+                  <span className="truncate">{`${item.nombre} ${item.apellido}`}</span>
                 </td>
-                <td className="px-4 py-2">{item.felicitaciones}</td>
-                <td className="px-4 py-2">{item.revisiones}</td>
+                <td className="px-2 py-1 text-sm font-bold">{item.puntaje}</td>
+                <td className="px-2 py-1 text-sm">{item.felicitaciones}</td>
+                <td className="px-2 py-1 text-sm">{item.revisiones}</td>
               </tr>
             ))}
           </tbody>
@@ -155,37 +172,28 @@ const Reconocemos: React.FC = () => {
   return (
     <div className="min-h-screen bg-gray-100 flex justify-center">
       <div className="container max-w-4xl p-4">
-        <h1 className="text-3xl font-bold mb-8 text-gray-800">Ranking Felicitar/Revisar</h1>
+        <h1 className="text-2xl font-bold mb-4 text-gray-800">Ranking de Feedback</h1>
         
         {error && <p className="text-red-500 mb-4">{error}</p>}
 
-        <div className="flex flex-col md:flex-row md:space-x-4 mb-4">
-          <select
-            value={añoSeleccionado}
-            onChange={(e) => setAñoSeleccionado(Number(e.target.value))}
-            className="mb-2 md:mb-0 p-2 border rounded"
-          >
-            {[...Array(5)].map((_, i) => (
-              <option key={i} value={new Date().getFullYear() - i}>
-                {new Date().getFullYear() - i}
-              </option>
-            ))}
-          </select>
-          <select
-            value={mesSeleccionado}
-            onChange={(e) => setMesSeleccionado(Number(e.target.value))}
-            className="p-2 border rounded"
-          >
-            {[...Array(12)].map((_, i) => (
-              <option key={i} value={i}>
-                {format(new Date(2000, i, 1), 'MMMM', { locale: es })}
-              </option>
-            ))}
-          </select>
+        <div className="mb-4">
+          <input
+            type="text"
+            value={fechaInput}
+            onChange={handleFechaChange}
+            placeholder="MM/YYYY"
+            className="p-2 border rounded w-28"
+          />
         </div>
 
-        <RankingTable ranking={rankingAnual} title="Top Anual" />
-        <RankingTable ranking={rankingMensual} title="Top Mensual" />
+        <RankingTable 
+          ranking={rankingMensual} 
+          title={`Top Mensual - ${format(parse(fechaSeleccionada, 'MM/yyyy', new Date()), 'MMMM yyyy', { locale: es })}`} 
+        />
+        <RankingTable 
+          ranking={rankingAnual} 
+          title={`Top Anual - ${fechaSeleccionada.split('/')[1]}`} 
+        />
       </div>
     </div>
   );
