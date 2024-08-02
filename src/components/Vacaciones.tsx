@@ -106,10 +106,11 @@ const Vacaciones: React.FC = () => {
   return (
     <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={es}>
       <div className="min-h-screen flex flex-col items-center justify-center bg-gray-100 p-4">
-        <h1 className="text-2xl font-bold mb-4">Mis Vacaciones</h1>
+    
         {error && <p className="text-red-500">{error}</p>}
         {!solicitudEnviada ? (
           <form onSubmit={handleSubmit} className="bg-gray-100 p-8 rounded-lg w-full max-w-lg space-y-4">
+                <h1 className="text-2xl font-bold mb-4">Mis Vacaciones</h1>
             <Box className="flex flex-col space-y-4">
               <DatePicker
                 label="Fecha de inicio"

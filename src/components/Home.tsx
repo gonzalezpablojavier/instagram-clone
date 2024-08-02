@@ -141,12 +141,12 @@ const Home: React.FC = () => {
           >
                 <div className="mb-6">
           
-              <div className="flex justify-center space-x-2">
+              <div className="flex justify-center space-x-2 ">
               {['contento', 'neutro', 'enojado', 'mal'].map((mood) => (
                   <button
                     key={mood}
                     onClick={() => handleMoodClick(mood)}
-                    className={`text-2xl transition-all duration-300 ${
+                    className={`text-2xl transition-all duration-300 shadow-md ${
                       selectedEmoji === mood
                         ? 'transform scale-150'
                         : 'hover:transform hover:scale-110'
