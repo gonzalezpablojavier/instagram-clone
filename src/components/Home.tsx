@@ -64,12 +64,12 @@ const Home: React.FC = () => {
   }, [colaboradorID, refreshKey, fetchData]);
 
   const handleMoodClick = async (selectedMood: string) => {
-    setMood(selectedMood);
-    setSelectedEmoji(selectedMood);
+
     try {
       const response = await axios.post(`${API_URL}/howareyou`, { mood: selectedMood, colaboradorID });
       if (response.data.ok === 1) {
         setMessage('Gracias por compartir!');
+        setLastMood({ mood: selectedMood });
      
       } else {
         setMessage('Hoy ya enviaste tu estado de ánimo!');
@@ -81,7 +81,7 @@ const Home: React.FC = () => {
      
     setTimeout(() => {
       setMessage(null);
-      setSelectedEmoji(null);  // Resetear el emoji seleccionado después de 3 segundos
+     // setSelectedEmoji(null);  // Resetear el emoji seleccionado después de 3 segundos
     }, 3000);
   };
   const renderMoodIcon = (mood: string) => {
@@ -147,7 +147,7 @@ const Home: React.FC = () => {
                     key={mood}
                     onClick={() => handleMoodClick(mood)}
                     className={`text-2xl transition-all duration-300 shadow-md ${
-                      selectedEmoji === mood
+                      lastMood && lastMood.mood  === mood
                         ? 'transform scale-150'
                         : 'hover:transform hover:scale-110'
                     }`}
