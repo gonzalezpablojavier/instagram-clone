@@ -16,6 +16,7 @@ import Home from './components/Home';
 import Vacaciones from './components/Vacaciones';
 import FeedbackColaborador from './components/FeedbackColaborador';
 import Unauthorized from './components/Unauthorized';
+import Reconocemos from './components/Reconocemos';
 import { Route } from './config/permissions';
 
 
@@ -60,6 +61,17 @@ const AppContent: React.FC = () => {
                 <ProtectedRouteWithPermission
                   path={Route.PanelPermisosTemporales}
                   element={<PanelPermisosTemporales />}
+                />
+              }
+            />
+
+
+            <RouterRoute
+              path={Route.Reconocemos}
+              element={
+                <ProtectedRouteWithPermission
+                  path={Route.Reconocemos}
+                  element={<Reconocemos />}
                 />
               }
             />

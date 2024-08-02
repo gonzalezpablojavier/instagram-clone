@@ -27,7 +27,7 @@ interface FeedbackData {
   colaboradorID: number;
   colaboradorIDDestino: number;
   normaID: number;
-  tipo: 'felicitacion' | 'intervencion';
+  tipo: 'felicitacion' | 'revision';
 }
 
 const FeedbackColaborador: React.FC = () => {
@@ -80,7 +80,7 @@ const FeedbackColaborador: React.FC = () => {
     setSuggestions([]);
   };
 
-  const handleFeedbackSubmit = async (tipo: 'felicitacion' | 'intervencion') => {
+  const handleFeedbackSubmit = async (tipo: 'felicitacion' | 'revision') => {
     if (!colaboradorLogueadoID) {
       setIsError(true);
       setMensaje('Error: No se pudo identificar al colaborador logueado.');
@@ -169,7 +169,7 @@ const FeedbackColaborador: React.FC = () => {
               Felicitar
             </button>
             <button
-              onClick={() => handleFeedbackSubmit('intervencion')}
+              onClick={() => handleFeedbackSubmit('revision')}
               className="flex-1 cursor-pointer px-4 py-2 text-center rounded-full border-2 border-blue-950 text-blue-950 font-bold transition-all duration-300 hover:bg-blue-950 hover:text-white"
             >
               Revisar

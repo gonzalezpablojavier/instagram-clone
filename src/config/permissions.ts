@@ -11,7 +11,8 @@ export enum Route {
   Login = '/login',
   FeedbackColaborador= '/FeedbackColaborador',
   PanelFeedBack= '/PanelFeedBack',
-  Unauthorized = '/unauthorized'
+  Unauthorized = '/unauthorized',
+  Reconocemos = '/Reconocemos'
 }
 
 export const ADMIN_IDS = ['0', '2', '8'];
@@ -30,7 +31,8 @@ export const ROUTE_PERMISSIONS: { [key in Route]: string[] } = {
   [Route.Vacaciones]: ['all'],
   [Route.Login]: ['all'],
   [Route.Unauthorized]: ['all'],
-  [Route.FeedbackColaborador]: ['all']
+  [Route.FeedbackColaborador]: ['all'],
+  [Route.Reconocemos]: ['all']
   
 };
 
