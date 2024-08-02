@@ -12,6 +12,7 @@ const Home: React.FC = () => {
   const [solicitud, setSolicitud] = useState<any>(null);
   const [solicitudVacaciones, setSolicitudVacaciones] = useState<any>(null);
   const [refreshKey, setRefreshKey] = useState(0);
+  const [selectedEmoji, setSelectedEmoji] = useState<string | null>(null);
   const API_URL = process.env.REACT_APP_API_URL;
   const navigate = useNavigate();
 
@@ -64,6 +65,7 @@ const Home: React.FC = () => {
 
   const handleMoodClick = async (selectedMood: string) => {
     setMood(selectedMood);
+    setSelectedEmoji(selectedMood);
     try {
       const response = await axios.post(`${API_URL}/howareyou`, { mood: selectedMood, colaboradorID });
       if (response.data.ok === 1) {
@@ -76,6 +78,11 @@ const Home: React.FC = () => {
       setMessage('Error al guardar el estado de ánimo');
       console.error(error);
     }
+     
+    setTimeout(() => {
+      setMessage(null);
+      setSelectedEmoji(null);  // Resetear el emoji seleccionado después de 3 segundos
+    }, 3000);
   };
   const renderMoodIcon = (mood: string) => {
     if (mood === 'contento') return "😊";
@@ -135,10 +142,20 @@ const Home: React.FC = () => {
                 <div className="mb-6">
           
               <div className="flex justify-center space-x-2">
-                <button onClick={() => handleMoodClick('contento')} className="text-2xl hover:transform hover:scale-110 transition duration-300">😊</button>
-                <button onClick={() => handleMoodClick('neutro')} className="text-2xl hover:transform hover:scale-110 transition duration-300">😐</button>
-                <button onClick={() => handleMoodClick('enojado')} className="text-2xl hover:transform hover:scale-110 transition duration-300">😠</button>
-                <button onClick={() => handleMoodClick('mal')} className="text-2xl hover:transform hover:scale-110 transition duration-300">😞</button>
+              {['contento', 'neutro', 'enojado', 'mal'].map((mood) => (
+                  <button
+                    key={mood}
+                    onClick={() => handleMoodClick(mood)}
+                    className={`text-2xl transition-all duration-300 ${
+                      selectedEmoji === mood
+                        ? 'transform scale-150'
+                        : 'hover:transform hover:scale-110'
+                    }`}
+                  >
+                    {renderMoodIcon(mood)}
+                  </button>
+                ))}
+             
               </div>
             </div>
             {message && (

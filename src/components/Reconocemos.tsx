@@ -1,125 +1,165 @@
-// src/components/Reconocemos.tsx
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
+import { format, startOfYear, endOfYear, eachMonthOfInterval } from 'date-fns';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 
-const posts = [
-  {
-    id: 1,
-    user: {
-      name: 'Agustin',
-      time: 'Hace 35 min',
-      profileImage: 'https://via.placeholder.com/50',
-    },
-    recognition: {
-      title: 'INNOVACIÓN',
-      image: 'https://loremflickr.com/200/100',
-      recipient: {
-        name: 'Marce Zarate',
-        description: 'Si bien es pasante, trabaja a la par del equipo, con muchas ganas y buenas ideas.',
-        profileImage: 'https://via.placeholder.com/50',
-      },
-      reactions: {
-        likes: 14,
-        claps: 10,
-        stars: 2,
-        thumbsUp: 2,
-        smileys: 2,
-      },
-      commentsCount: 4,
-    },
-  },
-  {
-    id: 2,
-    user: {
-      name: 'Pablin',
-      time: 'Hace 35 min',
-      profileImage: 'https://via.placeholder.com/50',
-    },
-    recognition: {
-      title: 'TRABAJO EN EQUIPO',
-      image: 'https://via.placeholder.com/200x100',
-      recipient: {
-        name: 'Marcos Caballero',
-        description: 'Siempre dispuesto a ayudar a sus compañeros y a aportar ideas.',
-        profileImage: 'https://via.placeholder.com/50',
-      },
-      reactions: {
-        likes: 8,
-        claps: 5,
-        stars: 1,
-        thumbsUp: 3,
-        smileys: 4,
-      },
-      commentsCount: 3,
-    },
-  },
-];
+interface Feedback {
+  id: number;
+  createdAt: string;
+  normaID: string;
+  tipo: string;
+  colaboradorIDDestino: number;
+}
+
+interface Colaborador {
+  id: string;
+  nombre: string;
+  apellido: string;
+  area: string;
+  colaboradorID: number;
+}
+
+interface RankingItem {
+  colaboradorID: number;
+  nombre: string;
+  apellido: string;
+  felicitaciones: number;
+  revisiones: number;
+  puntaje: number;
+}
 
 const Reconocemos: React.FC = () => {
-  return (
-    <div className="p-4 space-y-4">
-      {posts.map((post) => (
-        <div key={post.id} className="bg-white p-4 shadow-md rounded-lg">
-          <div className="flex items-center mb-4">
-            <img
-              src={post.user.profileImage}
-              alt={post.user.name}
-              className="w-10 h-10 rounded-full mr-4"
-            />
-            <div>
-              <p className="font-bold">{post.user.name}</p>
-              <p className="text-sm text-gray-500">{post.user.time}</p>
-            </div>
-          </div>
-          <div className="text-center mb-4">
-            <h2 className="text-lg font-bold">{post.recognition.title}</h2>
-            <img
-              src={post.recognition.image}
-              alt={post.recognition.title}
-              className="w-full h-40 object-cover rounded-lg"
-            />
-          </div>
-          <div className="flex items-center mb-4">
-            <img
-              src={post.recognition.recipient.profileImage}
-              alt={post.recognition.recipient.name}
-              className="w-10 h-10 rounded-full mr-4"
-            />
-            <div>
-              <p className="font-bold">{post.recognition.recipient.name}</p>
-              <p className="text-sm">{post.recognition.recipient.description}</p>
-            </div>
-          </div>
-          <div className="flex justify-around mb-4">
-            <button className="flex items-center space-x-1">
-              <span role="img" aria-label="like">👍</span>
-              <span>{post.recognition.reactions.likes}</span>
-            </button>
-            <button className="flex items-center space-x-1">
-              <span role="img" aria-label="clap">👏</span>
-              <span>{post.recognition.reactions.claps}</span>
-            </button>
-            <button className="flex items-center space-x-1">
-              <span role="img" aria-label="star">⭐</span>
-              <span>{post.recognition.reactions.stars}</span>
-            </button>
-            <button className="flex items-center space-x-1">
-              <span role="img" aria-label="thumbs up">👍</span>
-              <span>{post.recognition.reactions.thumbsUp}</span>
-            </button>
-            <button className="flex items-center space-x-1">
-              <span role="img" aria-label="smiley">😊</span>
-              <span>{post.recognition.reactions.smileys}</span>
-            </button>
-          </div>
-          <div className="flex justify-between items-center">
-            <p className="text-sm text-gray-500">{post.recognition.commentsCount} comentarios</p>
-            <div className="flex space-x-2">
-              <button className="p-2 hover:bg-gray-200 rounded-full">✏️</button>
-              <button className="p-2 hover:bg-gray-200 rounded-full">🗑️</button>
-            </div>
-          </div>
+  const [feedbacks, setFeedbacks] = useState<Feedback[]>([]);
+  const [colaboradores, setColaboradores] = useState<Colaborador[]>([]);
+  const [rankingAnual, setRankingAnual] = useState<RankingItem[]>([]);
+  const [rankingMensual, setRankingMensual] = useState<RankingItem[]>([]);
+  const [añoSeleccionado, setAñoSeleccionado] = useState<number>(new Date().getFullYear());
+  const [mesSeleccionado, setMesSeleccionado] = useState<number>(new Date().getMonth());
+  const [error, setError] = useState<string | null>(null);
+  
+  const API_URL = process.env.REACT_APP_API_URL;
+
+  useEffect(() => {
+    fetchFeedbacks();
+    fetchColaboradores();
+  }, []);
+
+  useEffect(() => {
+    if (feedbacks.length > 0 && colaboradores.length > 0) {
+      calcularRankingAnual();
+      calcularRankingMensual();
+    }
+  }, [feedbacks, colaboradores, añoSeleccionado, mesSeleccionado]);
+
+  const fetchFeedbacks = async () => {
+    try {
+      const response = await axios.get(`${API_URL}/feedback`);
+      setFeedbacks(response.data);
+    } catch (error) {
+      setError('Error al obtener los feedbacks');
+      console.error(error);
+    }
+  };
+
+  const fetchColaboradores = async () => {
+    try {
+      const response = await axios.get(`${API_URL}/usuarios-registrados`);
+      if (response.data.ok === 1 && Array.isArray(response.data.data)) {
+        setColaboradores(response.data.data);
+      } else {
+        console.error('La respuesta de colaboradores no es válida:', response.data);
+        setColaboradores([]);
+      }
+    } catch (error) {
+      console.error('Error al obtener los colaboradores:', error);
+      setError('Error al obtener los colaboradores');
+      setColaboradores([]);
+    }
+  };
+
+  const calcularRanking = (inicio: Date, fin: Date) => {
+    const ranking = colaboradores.map(colaborador => {
+      const feedbacksColaborador = feedbacks.filter(feedback => 
+        feedback.colaboradorIDDestino === colaborador.colaboradorID &&
+        new Date(feedback.createdAt) >= inicio &&
+        new Date(feedback.createdAt) <= fin
+      );
+
+      const felicitaciones = feedbacksColaborador.filter(f => f.tipo === 'felicitacion').length;
+      const revisiones = feedbacksColaborador.filter(f => f.tipo === 'revision').length;
+      const puntaje = felicitaciones - revisiones;
+
+      return {
+        colaboradorID: colaborador.colaboradorID,
+        nombre: colaborador.nombre,
+        apellido: colaborador.apellido,
+        felicitaciones,
+        revisiones,
+        puntaje
+      };
+    });
+
+    // Filtrar solo los colaboradores con puntos y ordenar
+    return ranking.filter(item => item.felicitaciones > 0 || item.revisiones > 0)
+                  .sort((a, b) => b.puntaje - a.puntaje);
+  };
+  const calcularRankingAnual = () => {
+    const inicio = startOfYear(new Date(añoSeleccionado, 0, 1));
+    const fin = endOfYear(new Date(añoSeleccionado, 0, 1));
+    setRankingAnual(calcularRanking(inicio, fin));
+  };
+
+  const calcularRankingMensual = () => {
+    const inicio = new Date(añoSeleccionado, mesSeleccionado, 1);
+    const fin = new Date(añoSeleccionado, mesSeleccionado + 1, 0);
+    setRankingMensual(calcularRanking(inicio, fin));
+  };
+  const CustomTooltip = ({ active, payload, label }: any) => {
+    if (active && payload && payload.length) {
+      const data = payload[0].payload;
+      return (
+        <div className="bg-white p-4 border rounded shadow">
+          <p className="font-bold">{`${data.nombre} ${data.apellido}`}</p>
+          <p>{`Puntaje: ${data.puntaje}`}</p>
+          <p>{`Felicitaciones: ${data.felicitaciones}`}</p>
+          <p>{`Revisiones: ${data.revisiones}`}</p>
         </div>
-      ))}
+      );
+    }
+    return null;
+  };
+
+  return (
+    <div className="container mx-auto p-6 bg-gray-100 min-h-screen">
+      <h1 className="text-3xl font-bold mb-8 text-gray-800">Ranking de Feedback</h1>
+      
+    
+
+      <div className="mt-8">
+        <h2 className="text-2xl font-bold mb-4">Top 10 Anual</h2>
+        <table className="w-full table-auto">
+          <thead className="bg-gray-200">
+            <tr>
+              <th className="px-4 py-2 text-left">Posición</th>
+              <th className="px-4 py-2 text-left">Nombre</th>
+              <th className="px-4 py-2 text-left">Felicitaciones</th>
+              <th className="px-4 py-2 text-left">Revisiones</th>
+              <th className="px-4 py-2 text-left">Puntaje</th>
+            </tr>
+          </thead>
+          <tbody>
+            {rankingAnual.slice(0, 10).map((item, index) => (
+              <tr key={item.colaboradorID} className="border-b hover:bg-gray-50">
+                <td className="px-4 py-2">{index + 1}</td>
+                <td className="px-4 py-2">{`${item.nombre} ${item.apellido}`}</td>
+                <td className="px-4 py-2">{item.felicitaciones}</td>
+                <td className="px-4 py-2">{item.revisiones}</td>
+                <td className="px-4 py-2">{item.puntaje}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 };
