@@ -196,7 +196,16 @@ const Home: React.FC = () => {
           >
             <img src="/images/vacaciones.png" className="w-6 h-6 md:w-8 md:h-8" alt="Vacaciones" />
           </GridButton>
-       
+
+
+          <GridButton 
+            bgColor="bg-green-500" 
+            onClick={() => navigate('/reconocemos')}
+            title="Ranking"
+            description=""
+          >
+            <img src="/images/star.svg" className="w-6 h-6 md:w-8 md:h-8" alt="Vacaciones" />
+          </GridButton>
           <GridButton 
             bgColor="bg-amber-400" 
             onClick={() => navigate('/Home')}
@@ -205,6 +214,8 @@ const Home: React.FC = () => {
           >
              <img src="/images/qr-code-scan-9795.png" className="w-6 h-6 md:w-8 md:h-8" alt="Vacaciones" />
           </GridButton>
+
+
         </div>
       </main>
     </div>
