@@ -43,15 +43,15 @@ const AppContent: React.FC = () => {
   const { isAuthenticated } = useAuth();
 
   return (
-    <div className="min-h-screen flex flex-col lg:flex-row">
+    <div className="flex flex-col h-screen">
       {isAuthenticated && (
         <div className="lg:w-20 lg:flex-shrink-0">
           <BottomNav />
         </div>
       )}
-      <div className="flex-grow flex flex-col">
+      <div className="flex-grow flex flex-col  overflow-hidden">
         {isAuthenticated && <Header />}
-        <main className={`flex-grow overflow-y-auto ${isAuthenticated ? 'mt-16 mb-16 lg:mb-0' : ''}`}>
+        <main className={`flex-grow overflow-auto ${isAuthenticated ? 'mt-16 mb-16 lg:mb-0' : ''}`}>
           <Routes>
             <RouterRoute path={Route.Login} element={<Login />} />
             <RouterRoute path={Route.Unauthorized} element={<Unauthorized />} />

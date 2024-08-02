@@ -13,11 +13,14 @@ html, body, #root {
   background-color: #f3f4f6;
 }
 
-.min-h-screen {
- /* min-height: calc(100vh - 128px);  Resta la altura del Header y del BottomNav */
-}
+
 /* Personalizar fuente */
 h2 {
   font-family: 'Montserrat','Roboto', sans-serif;
 }
 
+@layer utilities {
+  .mt-16 {
+    margin-top: 1.7rem !important;
+  }
+}
