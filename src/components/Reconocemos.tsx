@@ -172,7 +172,7 @@ const Reconocemos: React.FC = () => {
   return (
     <div className="min-h-screen bg-gray-100 flex justify-center">
       <div className="container max-w-4xl p-4">
-        <h1 className="text-2xl font-bold mb-4 text-gray-800">Ranking de Feedback</h1>
+        <h1 className="text-2xl font-bold mb-4 text-gray-800">Ranking de Felicitar/Revisar</h1>
         
         {error && <p className="text-red-500 mb-4">{error}</p>}
 
