@@ -152,6 +152,8 @@ const AdminPermisosTemporal: React.FC = () => {
               <th className="px-4 py-2 text-left text-gray-600">Fecha</th>
               <th className="px-4 py-2 text-left text-gray-600">Colaborador</th>
               <th className="px-4 py-2 text-left text-gray-600">Motivo</th>
+              <th className="px-4 py-2 text-left text-gray-600">Observaciones</th>
+              <th className="px-4 py-2 text-left text-gray-600">Horario</th>
               <th className="px-4 py-2 text-left text-gray-600">Area</th>  
               <th className="px-4 py-2 text-left text-gray-600">Estado</th>
             
@@ -184,6 +186,9 @@ const AdminPermisosTemporal: React.FC = () => {
                   <td className="px-4 py-2">{colaborador ? `${colaborador.nombre} ${colaborador.apellido}` : 'N/A'}</td>
                    
                   <td className="px-4 py-2">{permiso.motivo}</td>
+                  <td className="px-4 py-2">{permiso.observacion}</td>
+                  <td className="px-4 py-2">{permiso.horario}</td>
+                  
                   <td className="px-4 py-2">{colaborador ? `${colaborador.area}` : 'N/A'}</td>
              
                   <td className="px-4 py-2">
