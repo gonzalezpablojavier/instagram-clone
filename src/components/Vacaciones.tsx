@@ -146,24 +146,7 @@ const Vacaciones: React.FC = () => {
               onChange={handleChange}
               required
             />
-            <TextField
-              fullWidth
-              label="Motivo"
-              name="motivo"
-              value={formData.motivo}
-              onChange={handleChange}
-              required
-            />
-            <TextField
-              fullWidth
-              label="Observación"
-              name="observacion"
-              value={formData.observacion}
-              onChange={handleChange}
-              multiline
-              rows={4}
-              required
-            />
+          
             <Button type="submit" variant="contained" color="primary" fullWidth>
               Enviar 
             </Button>
@@ -177,9 +160,8 @@ const Vacaciones: React.FC = () => {
                 <p><span className="font-medium">Fecha de fin:</span> {ultimaVacacion.fechaPermisoHasta}</p>
                 <p><span className="font-medium">Área:</span> {ultimaVacacion.area}</p>
                 <p><span className="font-medium">Colaborador que cubre:</span> {ultimaVacacion.colaboradorCubre}</p>
-                <p><span className="font-medium">Motivo:</span> {ultimaVacacion.motivo}</p>
-                <p><span className="font-medium">Observación:</span> {ultimaVacacion.observacion}</p>
-                <p><span className="font-medium">Estado:</span> {ultimaVacacion.autorizado}</p>
+    
+           
                 <Button
                   onClick={handleDelete}
                   variant="contained"
