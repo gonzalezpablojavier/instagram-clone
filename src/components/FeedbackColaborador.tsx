@@ -39,12 +39,15 @@ const FeedbackColaborador: React.FC = () => {
   const [mensaje, setMensaje] = useState<string>('');
   const [isError, setIsError] = useState<boolean>(false);
   const [colaboradorLogueadoID, setColaboradorLogueadoID] = useState<number | null>(null);
+  const [felicitacionesDisponibles, setFelicitacionesDisponibles] = useState<number | null>(null);
 
   useEffect(() => {
     fetchColaboradores();
     const loggedInColaboradorID = localStorage.getItem('colaboradorID');
     if (loggedInColaboradorID) {
-      setColaboradorLogueadoID(parseInt(loggedInColaboradorID, 10));
+      const id = parseInt(loggedInColaboradorID, 10);
+      setColaboradorLogueadoID(id);
+      fetchFelicitacionesDisponibles(id);
     }
   }, []);
 
@@ -74,6 +77,19 @@ const FeedbackColaborador: React.FC = () => {
     }
   };
 
+  const fetchFelicitacionesDisponibles = async (colaboradorID: number) => {
+    try {
+      const response = await axios.get(`${API_URL}/feedback/felicitaciones-disponibles/${colaboradorID}`);
+      if (response.data.ok === 1) {
+        setFelicitacionesDisponibles(response.data.data.disponibles);
+      } else {
+        console.error('Error al obtener felicitaciones disponibles:', response.data);
+      }
+    } catch (error) {
+      console.error('Error al obtener felicitaciones disponibles:', error);
+    }
+  };
+
   const handleSelectColaborador = (colaborador: Colaborador) => {
     setSelectedColaboradorDestino(colaborador);
     setSearchTerm(`${colaborador.nombre} ${colaborador.apellido}`);
@@ -93,6 +109,12 @@ const FeedbackColaborador: React.FC = () => {
       return;
     }
 
+    if (tipo === 'felicitacion' && felicitacionesDisponibles !== null && felicitacionesDisponibles <= 0) {
+      setIsError(true);
+      setMensaje('No tienes felicitaciones disponibles este mes.');
+      return;
+    }
+
     setIsError(false);
     try {
       const feedbackData: FeedbackData = {
@@ -103,6 +125,10 @@ const FeedbackColaborador: React.FC = () => {
       };
       const response = await axios.post(`${API_URL}/feedback`, feedbackData);
       setMensaje(`Enviado exitosamente`);
+      // Actualizar felicitaciones disponibles si fue una felicitación
+      if ((tipo === 'revision'||tipo === 'felicitacion') && felicitacionesDisponibles !== null) {
+        setFelicitacionesDisponibles(felicitacionesDisponibles - 1);
+      }
       // Limpiar el formulario
       setSelectedColaboradorDestino(null);
       setSearchTerm('');
@@ -122,6 +148,15 @@ const FeedbackColaborador: React.FC = () => {
       <div className="w-full max-w-md bg-white rounded-lg shadow-md p-6">
         <h2 className="text-2xl font-bold mb-6 text-center text-gray-800">Felicitar/Revisar</h2>
         
+        {felicitacionesDisponibles !== null && (
+          <div className="mb-4 text-center">
+            <span className="font-semibold">Disponibles este mes: </span>
+            <span className={`font-bold ${felicitacionesDisponibles > 0 ? 'text-green-600' : 'text-red-600'}`}>
+              {felicitacionesDisponibles}
+            </span>
+          </div>
+        )}
+
         <div className="space-y-4">
           <div className="relative">
             <label className="block text-sm font-medium text-gray-700 mb-1">Buscar Colaborador</label>
@@ -164,7 +199,8 @@ const FeedbackColaborador: React.FC = () => {
           <div className="flex space-x-4">
             <button
               onClick={() => handleFeedbackSubmit('felicitacion')}
-              className="flex-1 cursor-pointer px-4 py-2 text-center rounded-full border-2 border-green-700 text-green-700 font-bold transition-all duration-300 hover:bg-green-700 hover:text-white"
+              className={`flex-1 cursor-pointer px-4 py-2 text-center rounded-full border-2 border-green-700 text-green-700 font-bold transition-all duration-300 hover:bg-green-700 hover:text-white ${felicitacionesDisponibles === 0 ? 'opacity-50 cursor-not-allowed' : ''}`}
+              disabled={felicitacionesDisponibles === 0}
             >
               Felicitar
             </button>
