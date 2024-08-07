@@ -228,7 +228,7 @@ const PanelAdminVacaciones: React.FC = () => {
               <th className="px-4 py-2 text-left text-gray-600">Colaborador</th>
               <th className="px-4 py-2 text-left text-gray-600">Área</th>
               <th className="px-4 py-2 text-left text-gray-600">Inicio</th>
-              <th className="px-4 py-2 text-left text-gray-600">Fin</th>
+              <th className="px-4 py-2 text-left text-gray-600">Final</th>
               <th className="px-4 py-2 text-left text-gray-600">Pedido(Días)</th>
               <th className="px-4 py-2 text-left text-gray-600">Corresponden</th>
 
