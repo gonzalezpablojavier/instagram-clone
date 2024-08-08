@@ -1,10 +1,33 @@
-import React, { useState, useEffect,useCallback  } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
-import { TextField, Button, Select, MenuItem, FormControl, InputLabel, Box, SelectChangeEvent } from '@mui/material';
+import { 
+  TextField, 
+  Button, 
+  Select, 
+  MenuItem, 
+  FormControl, 
+  InputLabel, 
+  SelectChangeEvent, 
+  Table, 
+  TableBody, 
+  TableCell, 
+  TableContainer, 
+  TableHead, 
+  TableRow, 
+  Paper 
+} from '@mui/material';
 import { es } from 'date-fns/locale';
+import { format } from 'date-fns';
+
+interface ApiResponse {
+  ok: number;
+  message: string;
+  data: Permiso[];
+}
+
 const initialState = {
   fechaPermiso: null,
   colaboradorCubre: '',
@@ -27,46 +50,49 @@ interface FormData {
   colaboradorID: string;
 }
 
+interface Permiso {
+  id: number;
+  fechaPermiso: string;
+  colaboradorCubre: string;
+  motivo: string;
+  area: string;
+  observacion: string;
+  horario: string;
+  autorizado: string;
+}
+
 const PermisoTemporal: React.FC = () => {
   const [formData, setFormData] = useState<FormData>(initialState);
-  const [solicitudEnviada, setSolicitudEnviada] = useState(false);
-  const [ultimoPermiso, setUltimoPermiso] = useState<any>(null);
   const [error, setError] = useState<string | null>(null);
-  const [isDeleting, setIsDeleting] = useState(false);
-  const API_URL = process.env.REACT_APP_API_URL;
-  const areas = ['Sistemas', 'Administración', 'Depósito', 'Comercial', 'GerenciaOP','Contabilidad','Compras','TV','Gerencia'];
-  const motivos = ['Personal', 'Estudio', 'Salud', 'Tramites'];
+  const [historialPermisos, setHistorialPermisos] = useState<Permiso[]>([]);
   const [refreshKey, setRefreshKey] = useState(0);
 
+  const API_URL = process.env.REACT_APP_API_URL;
+  const areas = ['Sistemas', 'Administración', 'Depósito', 'Comercial', 'GerenciaOP', 'Contabilidad', 'Compras', 'TV', 'Gerencia'];
+  const motivos = ['Personal', 'Estudio', 'Salud', 'Tramites'];
 
-  const verificarUltimoPermiso = useCallback(async (colaboradorID: string) => {
+  const obtenerHistorialPermisos = useCallback(async (colaboradorID: string) => {
     try {
-      const response = await axios.get(`${API_URL}/permiso-temporal/latest/${colaboradorID}`);
-      console.log('Último permiso:', response.data);
-      if (response.data && response.data.autorizado === 'Evaluando') {
-        setUltimoPermiso(response.data);
-        setSolicitudEnviada(true);
+      const response = await axios.get<ApiResponse>(`${API_URL}/permiso-temporal/historial/${colaboradorID}?limit=10`);
+      if (response.data.ok === 1 && Array.isArray(response.data.data)) {
+        setHistorialPermisos(response.data.data);
       } else {
-        setSolicitudEnviada(false);
-        setUltimoPermiso(null);
+        console.error('Respuesta inesperada:', response.data);
+        setHistorialPermisos([]);
       }
     } catch (error) {
-      console.error('Error al verificar el último permiso temporal:', error);
-      setSolicitudEnviada(false);
-      setUltimoPermiso(null);
+      console.error('Error al obtener el historial de permisos:', error);
+      setHistorialPermisos([]);
     }
   }, [API_URL]);
-
 
   useEffect(() => {
     const colaboradorID = localStorage.getItem('colaboradorID');
     if (colaboradorID) {
       setFormData((prevData) => ({ ...prevData, colaboradorID }));
-      verificarUltimoPermiso(colaboradorID);
+      obtenerHistorialPermisos(colaboradorID);
     }
-  }, [verificarUltimoPermiso, refreshKey]);
-
-
+  }, [obtenerHistorialPermisos, refreshKey]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -76,6 +102,7 @@ const PermisoTemporal: React.FC = () => {
   const handleAreaChange = (event: SelectChangeEvent<string>) => {
     setFormData((prevData) => ({ ...prevData, area: event.target.value }));
   };
+
   const handleMotivoChange = (event: SelectChangeEvent<string>) => {
     setFormData((prevData) => ({ ...prevData, motivo: event.target.value }));
   };
@@ -94,13 +121,11 @@ const PermisoTemporal: React.FC = () => {
       fechaPermiso: formData.fechaPermiso?.toISOString().split('T')[0],
     };
     try {
-      const response = await axios.post(`${API_URL}/permiso-temporal`, dataToSend);
+      const response = await axios.post<Permiso>(`${API_URL}/permiso-temporal`, dataToSend);
       if (response.status === 201) {
-        setRefreshKey(oldKey => oldKey + 1);  // Forzar actualización
-        setSolicitudEnviada(true);
-        setUltimoPermiso(response.data);
-        // Limpiar el formulario después de enviar
+        setRefreshKey(oldKey => oldKey + 1);
         setFormData(initialState);
+        obtenerHistorialPermisos(formData.colaboradorID);
       } else {
         setError('Error al enviar la solicitud');
       }
@@ -110,41 +135,19 @@ const PermisoTemporal: React.FC = () => {
     }
   };
 
-  const handleDelete = async () => {
-    setIsDeleting(true);
-    try {
-      const response = await axios.delete(`${API_URL}/permiso-temporal/delete-last-evaluating/${formData.colaboradorID}`);
-      if (response.status === 200) {
-        setFormData({ ...formData, fechaPermiso: null, colaboradorCubre: '', motivo: '', observacion: '', horario: '', autorizado: 'Evaluando' });
-        setRefreshKey(oldKey => oldKey + 1);  // Forzar actualización después de eliminar
-    
-        setSolicitudEnviada(false);
-        setUltimoPermiso(null);
-        setError(null);
-        console.log('Solicitud eliminada');
-      } else {
-        setError('Error al eliminar la solicitud');
-      }
-    } catch (error) {
-      setError('Error al eliminar la solicitud');
-      console.error(error);
-    } finally {
-      setIsDeleting(false);
-    }
-  };
-
   return (
     <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={es}>
       <div className="min-h-screen flex flex-col items-center justify-center bg-gray-100 p-4">
- 
-        {error && <p className="text-red-500">{error}</p>}
-        {!solicitudEnviada ? (
-          <form onSubmit={handleSubmit} className="bg-gray-100 p-8 rounded-lg shadow-md w-full max-w-lg space-y-4">
-                 <h1 className="text-2xl font-bold mb-4">Mi Permiso</h1>
+        {error && <p className="text-red-500 mb-4">{error}</p>}
+        <div className="bg-white p-8 rounded-lg shadow-md w-full max-w-lg space-y-4">
+          <h1 className="text-2xl font-bold mb-4">Solicitar Permiso Temporal</h1>
+          <form onSubmit={handleSubmit} className="space-y-4">
             <DatePicker
               label="Fecha del Permiso"
               value={formData.fechaPermiso}
               onChange={handleDateChange}
+          
+              slotProps={{ textField: { fullWidth: true } }}
             />
             <FormControl fullWidth>
               <InputLabel id="area-label">Área</InputLabel>
@@ -155,9 +158,7 @@ const PermisoTemporal: React.FC = () => {
                 label="Área"
               >
                 {areas.map((area) => (
-                  <MenuItem key={area} value={area}>
-                    {area}
-                  </MenuItem>
+                  <MenuItem key={area} value={area}>{area}</MenuItem>
                 ))}
               </Select>
             </FormControl>
@@ -170,9 +171,7 @@ const PermisoTemporal: React.FC = () => {
                 label="Motivo"
               >
                 {motivos.map((motivo) => (
-                  <MenuItem key={motivo} value={motivo}>
-                    {motivo}
-                  </MenuItem>
+                  <MenuItem key={motivo} value={motivo}>{motivo}</MenuItem>
                 ))}
               </Select>
             </FormControl>
@@ -184,7 +183,6 @@ const PermisoTemporal: React.FC = () => {
               onChange={handleChange}
               required
             />
-          
             <TextField
               fullWidth
               label="Observación"
@@ -192,7 +190,7 @@ const PermisoTemporal: React.FC = () => {
               value={formData.observacion}
               onChange={handleChange}
               multiline
-              rows={4}
+              rows={2}
               required
             />
             <TextField
@@ -207,31 +205,36 @@ const PermisoTemporal: React.FC = () => {
               Enviar Solicitud
             </Button>
           </form>
-        ) : (
-          <div className="bg-white p-8 rounded shadow-md w-full max-w-lg space-y-4">
-            <h3 className="text-xl font-semibold mb-4">Estado de la Solicitud</h3>
-            {ultimoPermiso && (
-              <>
-                <p><span className="font-medium">Fecha del Permiso:</span> {ultimoPermiso.fechaPermiso}</p>
-                <p><span className="font-medium">Área:</span> {ultimoPermiso.area}</p>
-                <p><span className="font-medium">Colaborador que cubre:</span> {ultimoPermiso.colaboradorCubre}</p>
-                <p><span className="font-medium">Motivo:</span> {ultimoPermiso.motivo}</p>
-                <p><span className="font-medium">Observación:</span> {ultimoPermiso.observacion}</p>
-                <p><span className="font-medium">Horario:</span> {ultimoPermiso.horario}</p>
-                <p><span className="font-medium">Estado:</span> {ultimoPermiso.autorizado}</p>
-                <Button
-                  onClick={handleDelete}
-                  variant="contained"
-                  color="secondary"
-                  fullWidth
-                  disabled={isDeleting}
-                >
-                  {isDeleting ? 'Eliminando...' : 'Eliminar Solicitud'}
-                </Button>
-              </>
-            )}
-          </div>
-        )}
+        </div>
+
+        {/* Historial de Permisos */}
+        <div className="bg-white p-8 rounded-lg shadow-md w-full max-w-lg mt-8">
+          <h2 className="text-xl font-semibold mb-4">Historial de Permisos</h2>
+          {historialPermisos.length > 0 ? (
+            <TableContainer component={Paper}>
+              <Table>
+                <TableHead>
+                  <TableRow>
+                    <TableCell>Fecha</TableCell>
+                    <TableCell>Motivo</TableCell>
+                    <TableCell>Estado</TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {historialPermisos.map((permiso) => (
+                    <TableRow key={permiso.id}>
+                      <TableCell>{format(new Date(permiso.fechaPermiso), 'dd/MM/yyyy')}</TableCell>
+                      <TableCell>{permiso.motivo}</TableCell>
+                      <TableCell>{permiso.autorizado}</TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </TableContainer>
+          ) : (
+            <p>No hay historial de permisos disponible.</p>
+          )}
+        </div>
       </div>
     </LocalizationProvider>
   );
