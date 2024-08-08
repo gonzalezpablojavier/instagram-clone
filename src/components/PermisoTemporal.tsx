@@ -20,7 +20,7 @@ import {
   Paper 
 } from '@mui/material';
 import { es } from 'date-fns/locale';
-import { format } from 'date-fns';
+import { format, parseISO, addDays } from 'date-fns';
 
 interface ApiResponse {
   ok: number;
@@ -135,6 +135,11 @@ const PermisoTemporal: React.FC = () => {
     }
   };
 
+  const adjustDate = (dateString: string) => {
+    const date = parseISO(dateString);
+    return addDays(date, 0);
+  };
+
   return (
     <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={es}>
       <div className="min-h-screen flex flex-col items-center justify-center bg-gray-100 p-4">
@@ -223,7 +228,8 @@ const PermisoTemporal: React.FC = () => {
                 <TableBody>
                   {historialPermisos.map((permiso) => (
                     <TableRow key={permiso.id}>
-                      <TableCell>{format(new Date(permiso.fechaPermiso), 'dd/MM/yyyy')}</TableCell>
+                      <TableCell>{format(adjustDate(permiso.fechaPermiso), 'dd/MM/yyyy')}</TableCell>
+               
                       <TableCell>{permiso.motivo}</TableCell>
                       <TableCell>{permiso.autorizado}</TableCell>
                     </TableRow>

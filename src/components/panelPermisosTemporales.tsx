@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { format } from 'date-fns';
-
+import { format, parseISO, addDays } from 'date-fns';
 interface Permiso {
   id: number;
   fechaPermiso: string;
@@ -114,6 +113,12 @@ const AdminPermisosTemporal: React.FC = () => {
     }
   };
 
+  const adjustDate = (dateString: string) => {
+    const date = parseISO(dateString);
+    return addDays(date, 0);
+  };
+
+
   return (
     <div className="container mx-auto p-6 bg-gray-100 min-h-screen">
       <h1 className="text-3xl font-bold mb-8 text-gray-800">Panel de Permisos</h1>
@@ -182,7 +187,9 @@ const AdminPermisosTemporal: React.FC = () => {
                       </div>
                     )}
                   </td>
-                  <td className="px-4 py-2">{format(new Date(permiso.fechaPermiso), 'dd/MM/yyyy')}</td>
+                  <td className="px-4 py-2">{format(adjustDate(permiso.fechaPermiso), 'dd/MM/yyyy')}</td>
+
+                 
                   <td className="px-4 py-2">{colaborador ? `${colaborador.nombre} ${colaborador.apellido}` : 'N/A'}</td>
                    
                   <td className="px-4 py-2">{permiso.motivo}</td>
