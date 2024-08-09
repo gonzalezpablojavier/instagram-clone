@@ -15,8 +15,8 @@ export enum Route {
   Reconocemos = '/Reconocemos'
 }
 
-export const ADMIN_IDS = ['4', '7', '134','137','148','149','150','151','110'];
-export const MANAGER_IDS = ['4', '7', '134','137','148','149','150','151','110'];
+export const ADMIN_IDS = ['4', '7', '134','137','148','149','150','151','110','8'];
+export const MANAGER_IDS = ['4', '7', '134','137','148','149','150','151','110','8'];
 
 export const ROUTE_PERMISSIONS: { [key in Route]: string[] } = {
   [Route.Home]: ['all'],
