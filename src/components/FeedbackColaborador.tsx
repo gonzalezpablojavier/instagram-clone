@@ -108,6 +108,17 @@ const FeedbackColaborador: React.FC = () => {
       setMensaje('Por favor, seleccione un colaborador destinatario y una norma antes de enviar el feedback.');
       return;
     }
+       // Verificación adicional para asegurarnos de que selectedColaboradorDestino no sea null
+    if (colaboradorLogueadoID === selectedColaboradorDestino.colaboradorID) {
+        setIsError(true);
+        setMensaje('No puedes enviarte un Reconocimiento o revisión a ti mismo.');
+        return;
+      }
+    if (!selectedColaboradorDestino || !selectedNorma) {
+      setIsError(true);
+      setMensaje('Por favor, seleccione un colaborador destinatario y una norma antes de enviar el feedback.');
+      return;
+    }
 
     if (tipo === 'felicitacion' && felicitacionesDisponibles !== null && felicitacionesDisponibles <= 0) {
       setIsError(true);
@@ -144,9 +155,9 @@ const FeedbackColaborador: React.FC = () => {
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-100 p-4">
+    <div className="flex items-center justify-center bg-gray-100 p-4">
       <div className="w-full max-w-md bg-white rounded-lg shadow-md p-6">
-        <h2 className="text-2xl font-bold mb-6 text-center text-gray-800">Felicitar/Revisar</h2>
+        <h2 className="text-2xl font-bold mb-6 text-center text-gray-800">Reconocer/Revisar</h2>
         
         {felicitacionesDisponibles !== null && (
           <div className="mb-4 text-center">

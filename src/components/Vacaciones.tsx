@@ -154,7 +154,7 @@ const Vacaciones: React.FC = () => {
 
   return (
     <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={es}>
-      <div className="min-h-screen flex flex-col items-center justify-center bg-gray-100 p-4">
+      <div className="flex flex-col items-center justify-center bg-gray-100 p-4">
         {error && <Alert severity="error" className="mb-4">{error}</Alert>}
         {validationMessage && (
           <Alert severity={validationMessage.type} className="mb-4">

@@ -13,8 +13,6 @@ const BottomNav: React.FC = () => {
      { path: Route.PermisoTemporal, icon: '/images/airport.svg', alt: 'Permiso temporal' },
     { path: Route.Vacaciones, icon: '/images/vacaciones.png', alt: 'Permiso temporal' },
     { path: Route.FeedbackColaborador, icon: '/images/search-favorite-8979.png', alt: 'Permiso temporal' },
-   
-    //{ path: Route.HowAreYou, icon: '/images/star.svg', alt: 'How are you' },
     { path: Route.PanelPermisosTemporales, icon: '/images/key.png', alt: 'Panel Permisos' },
     { path: Route.PanelAdminVacaciones, icon: '/images/calendar.png', alt: 'Panel Permisos' },
     { path: Route.PanelFeedBack, icon: '/images/setting-13814.png', alt: 'Panel Permisos' },

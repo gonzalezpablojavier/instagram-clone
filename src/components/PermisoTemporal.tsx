@@ -69,7 +69,7 @@ const PermisoTemporal: React.FC = () => {
 
   const API_URL = process.env.REACT_APP_API_URL;
   const areas = ['Sistemas', 'Administración', 'Depósito', 'Comercial', 'GerenciaOP', 'Contabilidad', 'Compras', 'TV', 'Gerencia'];
-  const motivos = ['Personal', 'Estudio', 'Salud', 'Tramites'];
+  const motivos = ['Personal', 'Estudio', 'Salud', 'Tramites','Home'];
 
   const obtenerHistorialPermisos = useCallback(async (colaboradorID: string) => {
     try {

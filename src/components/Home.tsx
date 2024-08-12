@@ -121,7 +121,7 @@ const Home: React.FC = () => {
   );
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-gray-100 p-4">
+    <div className=" flex flex-col items-center justify-center bg-gray-100 p-4">
       {!profile?.nombre && (
         <div className="w-full max-w-5xl mx-auto mb-4 bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4" role="alert">
           <p className="font-bold">Atención</p>
@@ -177,7 +177,7 @@ const Home: React.FC = () => {
         <GridButton 
           bgColor="bg-cyan-600" 
           onClick={() => navigate('/FeedbackColaborador')}
-          title={`Felicitar / Revisar (${felicitacionesDisponibles || 0})`}
+          title={`Reconocer / Revisar (${felicitacionesDisponibles || 0})`}
           description=""
         >
           <span className="text-2xl md:text-3xl">
