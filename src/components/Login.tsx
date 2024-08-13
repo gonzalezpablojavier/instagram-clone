@@ -47,7 +47,7 @@ const Login: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-cyan-600 bg-cover bg-center">
+    <div className="flex items-center  h-[100vh] justify-center bg-cyan-600 bg-cover bg-center">
       <form
         onSubmit={handleSubmit}
         className="bg-cyan-600 p-8 rounded-lg w-80 space-y-4 animate__animated animate__backInRight"

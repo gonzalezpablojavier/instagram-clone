@@ -10,7 +10,7 @@ const BottomNav: React.FC = () => {
 
   const navItems = [
     { path: Route.Home, icon: '/images/home.svg', alt: 'Home' },
-     { path: Route.PermisoTemporal, icon: '/images/airport.svg', alt: 'Permiso temporal' },
+    { path: Route.PermisoTemporal, icon: '/images/airport.svg', alt: 'Permiso temporal' },
     { path: Route.Vacaciones, icon: '/images/vacaciones.png', alt: 'Permiso temporal' },
     { path: Route.FeedbackColaborador, icon: '/images/search-favorite-8979.png', alt: 'Permiso temporal' },
     { path: Route.PanelPermisosTemporales, icon: '/images/key.png', alt: 'Panel Permisos' },
